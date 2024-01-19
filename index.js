@@ -25,20 +25,38 @@ app.get("/evaluate", (req, res) => {
         `;
   //   const child_process = spawn("node", ["-e", code_to_run]);
 
-  const lang = "python3";
-  const input = "";
-  const code = `print("Hello World")`;
+  const lang = "c";
+  const input = "5 10";
+  const code = `#include <stdio.h>
+
+  int main() {
+      int num1, num2, sum;
+  
+      printf("Enter two integers: ");
+      scanf("%d %d", &num1, &num2);
+  
+      sum = num1 + num2;
+  
+      printf("Sum: %d\n", sum);
+  
+      return 0;
+  }`;
 
   const tempFile = `temp.${lang}`;
 
   fs.writeFileSync(tempFile, code, "utf-8");
 
-  const dockerCommand = `docker run --rm -i --network none -v ${__dirname}:/code -w /code coderunner_${lang} /bin/bash -c "cat ${tempFile} | ${lang}"`;
+  const dockerCommand = `docker run --rm -i --network none -v ${__dirname}:/code -w /code coderunner_${lang} /bin/bash -c "gcc -o temp ${tempFile}"`;
+  const runCommand = `docker run --rm -i --network none -v ${__dirname}:/code -w /code coderunner_c /bin/bash -c "./temp"`;
 
   const child = exec(dockerCommand, (error, stdout, stderr) => {
     res.json({ stdout, stderr, error });
+
+    exec(runCommand, (error, stdout, stderr) => {
+      res.json({ stdout, stderr, error });
+    });
     // Remove the temporary code file
-    fs.unlinkSync(codeFile);
+    fs.unlinkSync(tempFile);
   });
 
   // Pass input to the code through stdin
