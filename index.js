@@ -1,50 +1,56 @@
-import { spawn, exec } from "child_process";
+import { exec, fork, spawn } from "child_process";
+import fs from "fs";
+import express from "express";
+import { dirname } from "path";
+import { fileURLToPath } from "url";
 
-const code_to_run = `
-const sum= (a,b)=>{
-    console.log("Hello from inside the function");
-    return a+b;
-};
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-sum(3,5);
-`;
+const app = express();
 
-const child_process = spawn("node", ["-e", code_to_run]);
-
-child_process.stdout.on("data", (data) => {
-  console.log(`stdout: ${data}`);
+app.get("/", (req, res) => {
+  res.send("Hello World");
 });
 
-// const ls = spawn("ls", ["-lh", "/usr"]);
+app.get("/evaluate", (req, res) => {
+  const code_to_run = `
+        const sum= (a,b)=>{
+            // console.log("Hello from inside the function");
+            return a+b;
+        };
+        
+        sum(3,5);
+        `;
+  //   const child_process = spawn("node", ["-e", code_to_run]);
 
-// ls.stdout.on("data", (data) => {
-//   console.log(`stdout: ${data}`);
-// });
+  const lang = "js";
+  const input = "";
+  const code = "";
 
-// ls.stderr.on("data", (data) => {
-//   console.error(`stderr: ${data}`);
-// });
+  const tempFile = `temp.${lang}`;
 
-// ls.on("close", (code) => {
-//   console.log(`child process exited with code ${code}`);
-// });
+  fs.writeFileSync(tempFile, code, "utf-8");
 
-// exec(code_to_run, (error, stdout, stderr) => {
-//   if (error) {
-//     console.error(`Error: ${error.message}`);
-//     return;
-//   }
-//   console.log(`stdout: ${stdout}`);
-//   console.error(`stderr: ${stderr}`);
-// });
+  const dockerCommand = `docker run --rm -i --network none -v ${__dirname}:/code -w /code coderunner_${lang} /bin/bash -c "cat ${tempFile} | ${lang}"`;
 
-// const userInput = "3 5";
+  const child = exec(dockerCommand, (error, stdout, stderr) => {
+    res.json({ stdout, stderr, error });
+    // Remove the temporary code file
+    fs.unlinkSync(codeFile);
+  });
 
-// exec(`node -e "${code_to_run}" "${userInput}"`, (error, stdout, stderr) => {
-//   if (error) {
-//     console.error(`Error: ${error.message}`);
-//     return;
-//   }
-//   console.log(`stdout: ${stdout}`);
-//   console.error(`stderr: ${stderr}`);
-// });
+  // Pass input to the code through stdin
+  child.stdin.write(input);
+  child.stdin.end();
+
+  //   fs.writeFile(fileName, code_to_run, (err) => {
+  //     const child_process = fork(fileName);
+
+  //     child_process.on("message", (data) => {});
+  //   });
+});
+
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
