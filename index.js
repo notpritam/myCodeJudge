@@ -14,6 +14,7 @@ app.get("/", (req, res) => {
 });
 
 app.get("/evaluate", (req, res) => {
+  console.log("Evaluate endpoint called");
   const code_to_run = `
         const sum= (a,b)=>{
             // console.log("Hello from inside the function");
@@ -24,9 +25,9 @@ app.get("/evaluate", (req, res) => {
         `;
   //   const child_process = spawn("node", ["-e", code_to_run]);
 
-  const lang = "js";
+  const lang = "python3";
   const input = "";
-  const code = "";
+  const code = `print("Hello World")`;
 
   const tempFile = `temp.${lang}`;
 
@@ -43,12 +44,6 @@ app.get("/evaluate", (req, res) => {
   // Pass input to the code through stdin
   child.stdin.write(input);
   child.stdin.end();
-
-  //   fs.writeFile(fileName, code_to_run, (err) => {
-  //     const child_process = fork(fileName);
-
-  //     child_process.on("message", (data) => {});
-  //   });
 });
 
 app.listen(3000, () => {
