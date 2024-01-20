@@ -1,16 +1,16 @@
 import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
+
+import { configure } from "./config/express.js";
+import connect from "./config/db.js";
 
 const app = express();
 
-app.use(cors());
-app.use(bodyParser.json());
+connect();
 
-app.get("/", (req, res) => {
-  res.send("Server is running");
-});
+configure(app);
 
-app.listen(3000, () => {
-  console.log("Server started");
+const port = process.env.PORT || 3001;
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
