@@ -56,10 +56,10 @@ const evaluateFunction = (lang, code, input, res) => {
       child_process.stdin.end();
       break;
     case "python":
-      tempFile = `temp.py`;
+      tempFile = `main.py`;
       fs.writeFileSync(tempFile, code, "utf-8");
 
-      runCommand = `docker run --rm -i --network none -v ${__dirname}:/code -w /code coderunner_python /bin/bash -c "python ${tempFile}"`;
+      runCommand = `docker run --rm -i -v ${__dirname}:/code coderunner_python`;
 
       child_process = exec(runCommand, (error, stdout, stderr) => {
         if (error) {
@@ -88,10 +88,11 @@ app.get("/evaluate", (req, res) => {
   // const code = `console.log(4+5);`;
 
   const lang = "python";
-  const input = "5 10";
-  const code = `num1, num2 = map(int, input().split())\nprint(num1 + num2)`;
+  const input = "geeks";
+  const code =
+    'def isPalindrome(s):\n    return s == s[::-1]\n\ns = input("")\nans = isPalindrome(s)\n\nif ans:\n    print("Yes")\nelse:\n    print("No")';
 
-  evaluateFunction(lang, code, input, { json: (data) => console.log(data) });
+  evaluateFunction(lang, code, input, { json: (data) => res.json(data) });
 });
 
 app.listen(3000, () => {
