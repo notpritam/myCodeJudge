@@ -2,11 +2,11 @@
   "name": "mycodejudge",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon src/app.js"
   },
   "author": "",
   "license": "ISC",
