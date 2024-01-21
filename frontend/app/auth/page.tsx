@@ -1,7 +1,23 @@
 "use client";
+
+import { Input } from "@/components/ui/input";
+
 const page = () => {
-  const handleLogin = () => {
-    console.log("login");
+  const handleLogin = async () => {
+    fetch(process.env.NEXT_PUBLIC_API_URL + "/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: "admin",
+        password: "admin",
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        console.log(res);
+      });
   };
   return (
     <div>
@@ -12,6 +28,8 @@ const page = () => {
         </div>
       </header>{" "}
       <div>
+        <Input placeholder="username" />
+        <Input placeholder="password" />
         <button onClick={handleLogin}>Login With Google</button>
       </div>
     </div>

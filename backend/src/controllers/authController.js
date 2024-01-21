@@ -1,9 +1,9 @@
 const login = (req, res) => {
-  res.send("Login");
+  res.status(200).json({ message: "Login" });
 };
 
 const register = (req, res) => {
-  res.send("Register");
+  res.status(200).json({ message: "Register" });
 };
 
 export { login, register };
