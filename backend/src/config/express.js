@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import authRoutes from "../routes/authRoute.js";
 import codeRoutes from "../routes/evaluateCodeRoute.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
@@ -14,9 +15,10 @@ const configure = (app) => {
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(helmet());
+  app.use(cookieParser());
 
   app.use("/api/auth", authRoutes);
-  app.use("/api/evaluate", codeRoutes);
+  app.use("/api/code", codeRoutes);
 
   app.use((err, req, res, next) => {
     console.error(err.stack);

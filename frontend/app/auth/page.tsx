@@ -6,11 +6,25 @@ import axios from "axios";
 
 const page = () => {
   const handleLogin = async (token: string) => {
-    const data = await axios.post(
+    const response = await axios.post(
       "http://localhost:3001/api/auth/google/callback",
       { token: token }
     );
-    console.log(data);
+
+    // const recivedToken = response.data.token;
+
+    // // Store the token in a cookie
+    // document.cookie = `token=${recivedToken}; path=/`;
+    // console.log(recivedToken);
+
+    if (response.status === 200) {
+      console.log("success");
+      console.log(response.data.user);
+      const token = response.data.token;
+      // Store the token in local storage
+      localStorage.setItem("token", token);
+      window.location.href = "/question/two-sum";
+    }
   };
 
   // eslint-disable-next-line react-hooks/rules-of-hooks

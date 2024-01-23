@@ -33,8 +33,7 @@ const callback = async (req, res) => {
     });
   }
 
-  res.cookie("token", token, { httpOnly: true });
-  res.status(200).json({ message: "Data", user: googleRes.data })(req, res);
+  res.status(200).json({ message: "Data", user: googleRes.data, token: token });
 };
 
 const logout = (req, res) => {

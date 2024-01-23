@@ -1,7 +1,8 @@
-import { verifyToken } from "../utils/jwt";
+import { verifyToken } from "../utils/jwt.js";
 
 const authenticateJWT = (req, res, next) => {
-  const token = req.headers["x-access-token"] || req.headers["Authorization"];
+  const token =
+    req.headers.authorization && req.headers.authorization.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Unauthorized" });
