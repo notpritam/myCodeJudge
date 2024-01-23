@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.6.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "lucide-react": "^0.312.0",
+    "monaco-editor": "^0.45.0",
+    "monaco-languages": "^2.11.1",
     "next": "14.1.0",
     "react": "^18",
     "react-dom": "^18",
