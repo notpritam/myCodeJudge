@@ -1,9 +1,9 @@
 import express from "express";
-import passport from "passport";
-import { login, register } from "../controllers/authController.js";
+import { callback, logout } from "../controllers/authController.js";
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/register", register);
+router.post("/google/callback", callback);
+
+router.get("/logout", logout);
 
 export default router;

@@ -6,8 +6,8 @@ const signToken = (user) => {
   });
 };
 
-const verifyToken = (token) => {
-  return jwt.verify(token, process.env.JWT_SECRET);
+const verifyToken = (token, callback) => {
+  jwt.verify(token, process.env.JWT_SECRET, callback);
 };
 
 export { signToken, verifyToken };

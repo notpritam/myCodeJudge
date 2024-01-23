@@ -1,27 +1,45 @@
+import User from "../models/User.js";
 import { signToken, verifyToken } from "../utils/jwt.js";
-import passport from "passport";
+import axios from "axios";
+const login = (req, res) => {};
 
-const login = (req, res) => {
-  const user = req.user;
+const callback = async (req, res) => {
+  const googleRes = await axios.get(
+    "https://www.googleapis.com/oauth2/v3/userinfo",
+    {
+      headers: {
+        Authorization: `Bearer ${req.body.token}`,
+      },
+      params: {
+        personFileds: "emailAddresses,names,photos",
+      },
+    }
+  );
 
-  // what we are passing as first argument to jwt.sign() will be available as decoded in authMiddleware.js where i am decoding the token
-  const token = jwt.sign(user, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  if (!googleRes.data.email) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const token = signToken(googleRes.data);
+
+  const user = await User.findOne({ googleId: googleRes.data.sub });
+
+  if (!user) {
+    await User.create({
+      googleId: googleRes.data.sub,
+      email: googleRes.data.email,
+      name: googleRes.data.name,
+      avatar: googleRes.data.picture,
+    });
+  }
 
   res.cookie("token", token, { httpOnly: true });
-
-  res.status(200).json({ message: "Login" });
+  res.status(200).json({ message: "Data", user: googleRes.data })(req, res);
 };
 
 const logout = (req, res) => {
   res.clearCookie("token");
-
   res.status(200).json({ message: "Logout Successfull" });
 };
 
-const register = (req, res) => {
-  res.status(200).json({ message: "Register" });
-};
-
-export { login, register };
+export { logout, callback };
