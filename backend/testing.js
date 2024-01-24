@@ -18,57 +18,61 @@ const tempFile = `main.py`;
 fs.writeFileSync(tempFile, userCode, "utf-8");
 
 const testCases = [
-  { a: 2, b: 3, expectedSum: 5 },
-  { a: -1, b: 7, expectedSum: 6 },
-  { a: 0, b: 0, expectedSum: 0 },
+  { input: "3\n4", expectedSum: 5 },
+  { input: "5\n4", expectedSum: 6 },
+  { input: "0\n0", expectedSum: 0 },
   // Add more test cases as needed
 ];
 
-const dockerContainer = spawn(
-  "docker",
-  [
-    "run",
-    "--rm",
-    "-i", // Pass input through stdin
-    "-v",
-    `${__dirname}:/code`,
-    "coderunner_python",
-    "python3",
-    "/code/main.py",
-  ],
-  {
-    stdio: ["pipe", "pipe", "pipe"],
-  }
-);
+for (let currentIndex = 0; currentIndex < testCases.length; currentIndex++) {
+  const dockerContainer = spawn(
+    "docker",
+    [
+      "run",
+      "-i", // Pass input through stdin
+      "-v",
+      `${__dirname}:/code`,
+      "coderunner_python",
+      "python3",
+      "/code/main.py",
+    ],
+    {
+      stdio: ["pipe", "pipe", "pipe"],
+    }
+  );
+  dockerContainer.stdin.write(`${testCases[currentIndex].input}\n`);
+  dockerContainer.stdout.on("data", (data) => {
+    const output = data.toString().trim();
+    console.log(output, `thisis index ${currentIndex}`);
 
-const input = testCases.map(({ a, b }) => `${a}\n${b}`).join("\n");
-dockerContainer.stdin.write(input);
-dockerContainer.stdin.end();
-
-const results = [];
-
-dockerContainer.stdout.on("data", (data) => {
-  const outputLines = data.toString().trim().split("\n");
-  outputLines.forEach((output, index) => {
     const testCaseResult = {
-      input: testCases[index],
-      expectedSum: testCases[index].expectedSum,
-      actualSum: parseInt(output.trim()),
-      success: parseInt(output.trim()) === testCases[index].expectedSum,
+      input: testCases[currentIndex].input,
+      expectedSum: testCases[currentIndex].expectedSum,
+      actualSum: parseInt(output),
+      success: parseInt(output) === testCases[currentIndex].expectedSum,
     };
-    results.push(testCaseResult);
+
+    console.log(testCaseResult);
+
+    currentIndex++;
+
+    if (currentIndex < testCases.length) {
+      // Write input for the next test case
+      const nextInput = `${testCases[currentIndex].a}\n${testCases[currentIndex].b}\n`;
+      dockerContainer.stdin.write(nextInput);
+    } else {
+      // All test cases processed, close stdin
+      dockerContainer.stdin.end();
+    }
   });
-});
 
-dockerContainer.stderr.on("data", (stderr) => {
-  console.error(`Docker container stderr: ${stderr}`);
-});
+  dockerContainer.stderr.on("data", (stderr) => {
+    console.error(`Docker container stderr: ${stderr}`);
+  });
+}
 
-dockerContainer.on("close", (code) => {
-  console.log(`Docker container closed with code ${code}`);
-  // Remove the temporary code file
-  fs.unlinkSync(tempFile);
-
-  // Return the results to the user
-  console.log(results);
-});
+// dockerContainer.on("close", (code) => {
+//   console.log(`Docker container closed with code ${code}`);
+//   // Remove the temporary code file
+//   fs.unlinkSync(tempFile);
+// });
