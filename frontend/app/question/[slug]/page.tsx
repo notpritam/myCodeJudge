@@ -32,25 +32,9 @@ function Page({ params }: { params: { slug: string } }) {
   const editorRef = useRef(null);
 
   const someJSCodeExample = `
-  // The source (has been changed) is https://github.com/facebook/react/issues/5465#issuecomment-157888325
-
-  const CANCELATION_MESSAGE = {
-    type: 'cancelation',
-    msg: 'operation is manually canceled',
+  const sum = (a, b) => {
+    console.log(a + b);
   };
-
-  function makeCancelable(promise) {
-    let hasCanceled_ = false;
-
-    const wrappedPromise = new Promise((resolve, reject) => {
-      promise.then(val => hasCanceled_ ? reject(CANCELATION_MESSAGE) : resolve(val));
-      promise.catch(reject);
-    });
-
-    return (wrappedPromise.cancel = () => (hasCanceled_ = true), wrappedPromise);
-  }
-
-  export default makeCancelable;
 `;
 
   const someCSSCodeExample = `
@@ -251,7 +235,7 @@ function Page({ params }: { params: { slug: string } }) {
     },
   };
 
-  const [file, setFile] = useState(files["style.css"]);
+  const [file, setFile] = useState(files["script.js"]);
 
   function handleEditorDidMount(editor: any, monaco: Monaco) {
     // here is the editor instance
