@@ -69,7 +69,13 @@ for (let currentIndex = 0; currentIndex < testCases.length; currentIndex++) {
   dockerContainer.stderr.on("data", (stderr) => {
     console.error(`Docker container stderr: ${stderr}`);
   });
+  dockerContainer.on("close", (code) => {
+    console.log(`Docker container closed with code ${code}`);
+    // Remove the temporary code file
+    // fs.unlinkSync(tempFile);
+  });
 }
+// fs.unlinkSync(tempFile);
 
 // dockerContainer.on("close", (code) => {
 //   console.log(`Docker container closed with code ${code}`);
