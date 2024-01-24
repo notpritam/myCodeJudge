@@ -1,7 +1,11 @@
-FROM python:latest
+# Use an official Python runtime as a parent image
+FROM python:3.8-slim
 
-ENV FILE_NAME=main.py
-
+# Set the working directory to /code
 WORKDIR /code
 
-CMD ["python", "main.py"]
+# Copy the current directory contents into the container at /code
+COPY main.py .
+
+# Specify the command to run your application
+CMD ["python3", "/code/main.py"]
