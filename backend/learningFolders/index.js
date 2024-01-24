@@ -56,6 +56,7 @@ const evaluateFunction = (lang, code, input, res) => {
       child_process.stdin.end();
       break;
     case "python":
+      //Already Working Code
       tempFile = `main.py`;
       fs.writeFileSync(tempFile, code, "utf-8");
 
