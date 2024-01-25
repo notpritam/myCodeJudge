@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import CodeSnippet from "./CodeSnippet.js";
+import TestCases from "./TestCases.js";
 
 const questionSchema = new mongoose.Schema({
   id: {
@@ -42,6 +43,10 @@ const questionSchema = new mongoose.Schema({
   },
   codeSnippets: {
     type: [CodeSnippet],
+    required: true,
+  },
+  testCases: {
+    type: [TestCases],
     required: true,
   },
 });
