@@ -48,7 +48,7 @@ const editorConfig = {
   ],
 };
 
-const Editor = () => {
+const TextEditor = () => {
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
   const [isLinkEditMode, setIsLinkEditMode] = useState<boolean>(false);
@@ -83,4 +83,4 @@ const Editor = () => {
   );
 };
 
-export default Editor;
+export default TextEditor;

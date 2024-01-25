@@ -15,7 +15,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import Editor from "@/components/editor/Editor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import TextEditor from "@/components/editor/Editor";
+import { Editor } from "@monaco-editor/react";
+import { set } from "zod";
 
 interface CodeSnippet {
   lang: string;
@@ -31,18 +34,16 @@ function Page() {
 
   const [addQuestionObject, setAddQuestionObject] = useState({} as any);
 
-  const [codeSnippets, setCodeSnippets] = useState<CodeSnippet[]>([]);
-
-  const languagesList: CodeSnippet[] = [
+  const [languagesList, setLanguageList] = useState<CodeSnippet[]>([
     {
-      lang: "js",
+      lang: "javascript",
       language: "Javascript",
       code: `function add(a,b){
         return a+b;
       }`,
     },
     {
-      lang: "py",
+      lang: "python",
       language: "Python",
       code: `def add(a,b):
         return a+b`,
@@ -52,12 +53,13 @@ function Page() {
       language: "C++",
       code: `int add(int a,int b){}`,
     },
-  ];
-  const [codeSnippet, setCodeSnippet] = useState<CodeSnippet>({
-    lang: "",
-    language: "",
-    code: "",
-  });
+  ]);
+
+  // const [codeSnippet, setCodeSnippet] = useState<CodeSnippet>({
+  //   lang: "",
+  //   language: "",
+  //   code: "",
+  // });
 
   // Function to add dummy data of Payment structure to data array
   const addDummyData = () => {
@@ -198,9 +200,46 @@ function Page() {
 
                   {/* Add Question Content */}
 
-                  <Editor />
+                  <TextEditor />
 
                   {/* Add Code Snippets */}
+
+                  <Tabs defaultValue="account" className="w-[400px]">
+                    <TabsList>
+                      {languagesList.map((item) => (
+                        <TabsTrigger value={item.lang}>
+                          {item.language}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+
+                    {languagesList.map((item) => (
+                      <TabsContent value={item.lang}>
+                        <Editor
+                          height="50vh"
+                          defaultLanguage={item.lang}
+                          defaultValue={item.code}
+                          theme="vs-dark"
+                          width="80vh"
+                          onChange={(e) => {
+                            console.log(e);
+                            const updatedList = languagesList.map(
+                              (langItem) => {
+                                if (langItem.lang === item.lang) {
+                                  return { ...langItem, code: e as string };
+                                }
+                                return langItem;
+                              }
+                            );
+
+                            setLanguageList(updatedList);
+                          }}
+                        />
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+
+                  {/* Add TestCases Now  */}
                 </>
               )}
             </div>
