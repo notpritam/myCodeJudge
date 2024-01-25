@@ -5,11 +5,25 @@ import { Code, Plus, Users } from "lucide-react";
 import React, { useState } from "react";
 import { DataTable } from "./data-table";
 import { Payment, columns } from "./columns";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Badge } from "@/components/ui/badge";
+import Editor from "@/components/editor/Editor";
 
 function Page() {
   const [selectedTab, setSelectedTab] = useState<String>("dashboard");
 
   const data: Payment[] = [];
+  const [addQuestion, setAddQuestion] = useState(false);
+
+  const [addQuestionObject, setAddQuestionObject] = useState({} as any);
 
   // Function to add dummy data of Payment structure to data array
   const addDummyData = () => {
@@ -56,7 +70,10 @@ function Page() {
             {/* Heading of Section */}
             <div>
               <span className="text-[1.5rem] dark:text-primary">Questions</span>
-              <Button className="float-right">
+              <Button
+                onClick={() => setAddQuestion(true)}
+                className="float-right"
+              >
                 <Plus /> Add New
               </Button>
             </div>
@@ -64,7 +81,89 @@ function Page() {
             {/* Questions List */}
 
             <div className="container dark text-white mx-auto py-10">
-              <DataTable columns={columns} data={data} />
+              {!addQuestion ? (
+                <DataTable columns={columns} data={data} />
+              ) : (
+                <>
+                  <Input
+                    placeholder="Enter Question Title"
+                    onChange={(e) =>
+                      setAddQuestionObject({
+                        ...addQuestionObject,
+                        title: e.target.value,
+                      })
+                    }
+                  />
+                  <Input
+                    placeholder="Enter Question Slug"
+                    onChange={(e) =>
+                      setAddQuestionObject({
+                        ...addQuestionObject,
+                        "title-slug": e.target.value,
+                      })
+                    }
+                  />
+
+                  {/* Add Question Level */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger>
+                      Choose Level :-{" "}
+                      {addQuestionObject.level ? (
+                        <Badge
+                          variant="outline"
+                          className="capitalize text-[1rem]"
+                        >
+                          {addQuestionObject.level}
+                        </Badge>
+                      ) : (
+                        "Select"
+                      )}
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>
+                        <Button
+                          onClick={() =>
+                            setAddQuestionObject({
+                              ...addQuestionObject,
+                              level: "easy",
+                            })
+                          }
+                        >
+                          Easy
+                        </Button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Button
+                          onClick={() =>
+                            setAddQuestionObject({
+                              ...addQuestionObject,
+                              level: "medium",
+                            })
+                          }
+                        >
+                          Medium
+                        </Button>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <Button
+                          onClick={() =>
+                            setAddQuestionObject({
+                              ...addQuestionObject,
+                              level: "hard",
+                            })
+                          }
+                        >
+                          Hard
+                        </Button>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+
+                  {/* Add Question Content */}
+
+                  <Editor />
+                </>
+              )}
             </div>
           </div>
         )}

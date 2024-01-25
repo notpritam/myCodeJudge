@@ -4,8 +4,8 @@ import TestCases from "./TestCases.js";
 
 const questionSchema = new mongoose.Schema({
   id: {
-    type: Number,
-    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    default: mongoose.Types.ObjectId,
     unique: true,
   },
   level: {
@@ -27,14 +27,15 @@ const questionSchema = new mongoose.Schema({
   "title-slug": {
     type: String,
     required: true,
+    unique: true,
   },
   likes: {
     type: Number,
-    required: true,
+    default: 0,
   },
   dislikes: {
     type: Number,
-    required: true,
+    default: 0,
   },
 
   content: {
