@@ -27,7 +27,7 @@ function Page() {
   addDummyData();
 
   return (
-    <div className="min-h-screen max-h-screen min-w-screen max-w-screen  p-8 pt-4 dark bg-black">
+    <div className="min-h-screen max-h-screen min-w-screen max-w-screen overflow-hidden  p-8 pt-4 dark bg-black">
       <header className="flex justify-between border-b-2 pb-2">
         <span className="font-bold dark:text-primary tracking-wider text-[18px]">
           MyCodeJudge
@@ -40,7 +40,7 @@ function Page() {
       </header>
 
       <main className="flex  min-h-[calc(100%-24px)] ">
-        <div className="flex flex-col pt-4 gap-4 pr-4 bg-black  border-r-2 h-[100%]">
+        <div className="flex flex-col pt-4 gap-4 pr-4 bg-black  border-r-2 ">
           <Button onClick={() => setSelectedTab("questions")}>
             <Code />
           </Button>
@@ -52,7 +52,7 @@ function Page() {
         {selectedTab === "dashboard" && <div className="h-full w-full"></div>}
 
         {selectedTab === "questions" && (
-          <div className="h-full w-full p-4">
+          <div className=" w-full p-4">
             {/* Heading of Section */}
             <div>
               <span className="text-[1.5rem] dark:text-primary">Questions</span>
