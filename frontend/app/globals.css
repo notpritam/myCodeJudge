@@ -115,7 +115,6 @@ h1 {
 .editor-container {
   margin: 20px auto 20px auto;
   border-radius: 2px;
-  max-width: 780px;
   color: #000;
   position: relative;
   line-height: 20px;
@@ -126,7 +125,6 @@ h1 {
 }
 
 .editor-inner {
-  width: 788px;
   background: #fff;
   position: relative;
 }
@@ -419,7 +417,6 @@ pre::-webkit-scrollbar-thumb {
   margin-bottom: 1px;
   background: hsl(0, 0%, 100%);
   padding: 4px;
-  width: 780px;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
   vertical-align: middle;

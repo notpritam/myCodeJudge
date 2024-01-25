@@ -17,6 +17,12 @@ import {
 import { Badge } from "@/components/ui/badge";
 import Editor from "@/components/editor/Editor";
 
+interface CodeSnippet {
+  lang: string;
+  language: string;
+  code: string;
+}
+
 function Page() {
   const [selectedTab, setSelectedTab] = useState<String>("dashboard");
 
@@ -24,6 +30,34 @@ function Page() {
   const [addQuestion, setAddQuestion] = useState(false);
 
   const [addQuestionObject, setAddQuestionObject] = useState({} as any);
+
+  const [codeSnippets, setCodeSnippets] = useState<CodeSnippet[]>([]);
+
+  const languagesList: CodeSnippet[] = [
+    {
+      lang: "js",
+      language: "Javascript",
+      code: `function add(a,b){
+        return a+b;
+      }`,
+    },
+    {
+      lang: "py",
+      language: "Python",
+      code: `def add(a,b):
+        return a+b`,
+    },
+    {
+      lang: "cpp",
+      language: "C++",
+      code: `int add(int a,int b){}`,
+    },
+  ];
+  const [codeSnippet, setCodeSnippet] = useState<CodeSnippet>({
+    lang: "",
+    language: "",
+    code: "",
+  });
 
   // Function to add dummy data of Payment structure to data array
   const addDummyData = () => {
@@ -132,17 +166,20 @@ function Page() {
                           Easy
                         </Button>
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Button
-                          onClick={() =>
-                            setAddQuestionObject({
-                              ...addQuestionObject,
-                              level: "medium",
-                            })
-                          }
+                      <DropdownMenuItem
+                        onClick={() =>
+                          setAddQuestionObject({
+                            ...addQuestionObject,
+                            level: "medium",
+                          })
+                        }
+                      >
+                        {/* <Button
+                          
                         >
                           Medium
-                        </Button>
+                        </Button> */}
+                        Medium
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Button
@@ -162,6 +199,8 @@ function Page() {
                   {/* Add Question Content */}
 
                   <Editor />
+
+                  {/* Add Code Snippets */}
                 </>
               )}
             </div>
