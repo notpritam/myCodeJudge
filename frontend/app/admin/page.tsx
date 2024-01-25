@@ -1,15 +1,35 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Code, Users } from "lucide-react";
+import { Code, Plus, Users } from "lucide-react";
 import React, { useState } from "react";
+import { DataTable } from "./data-table";
+import { Payment, columns } from "./columns";
 
 function Page() {
   const [selectedTab, setSelectedTab] = useState<String>("dashboard");
+
+  const data: Payment[] = [];
+
+  // Function to add dummy data of Payment structure to data array
+  const addDummyData = () => {
+    for (let i = 0; i < 100; i++) {
+      const dummyPayment: Payment = {
+        id: `${i + 1}`, // Unique id for each entry
+        amount: 100 + i, // Unique amount for each entry
+        status: "success", // Add status field
+        email: `dummy${i + 1}@example.com`, // Unique email for each entry
+      };
+      data.push(dummyPayment);
+    }
+  };
+
+  addDummyData();
+
   return (
     <div className="min-h-screen max-h-screen min-w-screen max-w-screen  p-8 pt-4 dark bg-black">
       <header className="flex justify-between border-b-2 pb-2">
-        <span className="font-bold dark:text-white tracking-wider text-[18px]">
+        <span className="font-bold dark:text-primary tracking-wider text-[18px]">
           MyCodeJudge
         </span>
 
@@ -32,7 +52,21 @@ function Page() {
         {selectedTab === "dashboard" && <div className="h-full w-full"></div>}
 
         {selectedTab === "questions" && (
-          <div className="h-full w-full">{/* <!-- Stepper --> */}</div>
+          <div className="h-full w-full p-4">
+            {/* Heading of Section */}
+            <div>
+              <span className="text-[1.5rem] dark:text-primary">Questions</span>
+              <Button className="float-right">
+                <Plus /> Add New
+              </Button>
+            </div>
+
+            {/* Questions List */}
+
+            <div className="container dark text-white mx-auto py-10">
+              <DataTable columns={columns} data={data} />
+            </div>
+          </div>
         )}
       </main>
     </div>
