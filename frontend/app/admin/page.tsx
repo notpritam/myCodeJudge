@@ -20,6 +20,7 @@ import TextEditor from "@/components/editor/Editor";
 import { Editor } from "@monaco-editor/react";
 import { useSearchParams } from "next/navigation";
 import { set } from "zod";
+import axios from "axios";
 
 interface CodeSnippet {
   lang: string;
@@ -113,6 +114,12 @@ function Page() {
     const question = {
       ...addQuestionObject,
     };
+
+    const res = await axios.post("/api/questions/add", question);
+
+    if (res.status === 200) {
+      console.log("Question Added Successfully");
+    }
 
     console.log(question);
   };

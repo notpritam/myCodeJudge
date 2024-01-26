@@ -5,5 +5,9 @@ export const submitCode = (req, res) => {
 
 export const addQuestion = (req, res) => {
   console.log(req.body);
-  res.send("Add Question True");
+  res
+    .json({
+      id: "1",
+    })
+    .status(200);
 };
