@@ -17,7 +17,7 @@ const questionSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
-  company: {
+  companies: {
     type: [String],
   },
   title: {

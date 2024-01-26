@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Code, Plus, Users } from "lucide-react";
+import { Code, Delete, Plus, Trash2, Users } from "lucide-react";
 import React, { useState } from "react";
 import { DataTable } from "./data-table";
 import { Payment, columns } from "./columns";
@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TextEditor from "@/components/editor/Editor";
 import { Editor } from "@monaco-editor/react";
+import { useSearchParams } from "next/navigation";
 import { set } from "zod";
 
 interface CodeSnippet {
@@ -36,12 +37,20 @@ interface Question {
   "title-slug": string;
   level: string;
   content: string;
-  code: CodeSnippet[];
+  codeSnippets: CodeSnippet[];
+  topics: string[];
+  companies: string[];
   testCases: TestCase[];
 }
 
 function Page() {
-  const [selectedTab, setSelectedTab] = useState<String>("dashboard");
+  const searchParams = useSearchParams();
+
+  const section = searchParams.get("section");
+
+  const [selectedTab, setSelectedTab] = useState<String>(
+    section || "dashboard"
+  );
 
   const data: Payment[] = [];
   const [addQuestion, setAddQuestion] = useState(false);
@@ -51,42 +60,39 @@ function Page() {
     "title-slug": "",
     level: "",
     content: "",
-    code: [],
+    codeSnippets: [
+      {
+        lang: "javascript",
+        language: "Javascript",
+        code: `function add(a,b){
+        return a+b;
+      }`,
+      },
+      {
+        lang: "python",
+        language: "Python",
+        code: `def add(a,b):
+        return a+b`,
+      },
+      {
+        lang: "cpp",
+        language: "C++",
+        code: `int add(int a,int b){}`,
+      },
+    ],
+    companies: [],
+    topics: [],
     testCases: [],
   });
 
-  const [languagesList, setLanguageList] = useState<CodeSnippet[]>([
-    {
-      lang: "javascript",
-      language: "Javascript",
-      code: `function add(a,b){
-        return a+b;
-      }`,
-    },
-    {
-      lang: "python",
-      language: "Python",
-      code: `def add(a,b):
-        return a+b`,
-    },
-    {
-      lang: "cpp",
-      language: "C++",
-      code: `int add(int a,int b){}`,
-    },
-  ]);
-
-  const [testCases, setTestCases] = useState<TestCase[]>([]);
   const [currentTestCase, setCurrentTestCase] = useState<TestCase>({
     input: "",
     output: "",
   });
 
-  // const [codeSnippet, setCodeSnippet] = useState<CodeSnippet>({
-  //   lang: "",
-  //   language: "",
-  //   code: "",
-  // });
+  const [currentTopic, setCurrentTopic] = useState<string>("");
+
+  const [currentCompany, setCurrentCompany] = useState<string>("");
 
   // Function to add dummy data of Payment structure to data array
   const addDummyData = () => {
@@ -102,6 +108,14 @@ function Page() {
   };
 
   addDummyData();
+
+  const submitQuestion = async () => {
+    const question = {
+      ...addQuestionObject,
+    };
+
+    console.log(question);
+  };
 
   return (
     <div className="min-h-screen max-h-screen min-w-screen max-w-screen  p-8 pt-4 dark bg-black">
@@ -147,7 +161,7 @@ function Page() {
               {!addQuestion ? (
                 <DataTable columns={columns} data={data} />
               ) : (
-                <>
+                <div className="flex flex-col gap-4">
                   <Input
                     placeholder="Enter Question Title"
                     onChange={(e) =>
@@ -183,17 +197,15 @@ function Page() {
                       )}
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem>
-                        <Button
-                          onClick={() =>
-                            setAddQuestionObject({
-                              ...addQuestionObject,
-                              level: "easy",
-                            })
-                          }
-                        >
-                          Easy
-                        </Button>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          setAddQuestionObject({
+                            ...addQuestionObject,
+                            level: "easy",
+                          })
+                        }
+                      >
+                        Easy
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() =>
@@ -203,27 +215,118 @@ function Page() {
                           })
                         }
                       >
-                        {/* <Button
-                          
-                        >
-                          Medium
-                        </Button> */}
                         Medium
                       </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Button
-                          onClick={() =>
-                            setAddQuestionObject({
-                              ...addQuestionObject,
-                              level: "hard",
-                            })
-                          }
-                        >
-                          Hard
-                        </Button>
+                      <DropdownMenuItem
+                        onClick={() =>
+                          setAddQuestionObject({
+                            ...addQuestionObject,
+                            level: "hard",
+                          })
+                        }
+                      >
+                        Hard
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
+
+                  {/* Add Topics Now  */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[1.5rem] dark:text-primary">
+                      Topic List
+                    </span>
+                    <Input
+                      placeholder="Enter Topic"
+                      onChange={(e) => {
+                        setCurrentTopic(e.target.value);
+                      }}
+                    />
+
+                    <Button
+                      onClick={() =>
+                        setAddQuestionObject({
+                          ...addQuestionObject,
+                          topics: [...addQuestionObject.topics, currentTopic],
+                        })
+                      }
+                    >
+                      Add New
+                    </Button>
+
+                    <div className="flex gap-2">
+                      {addQuestionObject.topics.map((item, index) => {
+                        return (
+                          <Badge className="flex gap-4" key={index}>
+                            {item}{" "}
+                            <Trash2
+                              className="cursor-pointer"
+                              onClick={() => {
+                                const updatedList =
+                                  addQuestionObject.topics.filter(
+                                    (topic) => topic !== item
+                                  );
+
+                                setAddQuestionObject({
+                                  ...addQuestionObject,
+                                  topics: updatedList,
+                                });
+                              }}
+                            />
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Add Companies Now  */}
+                  <div className="flex flex-col gap-2">
+                    <span className="text-[1.5rem] dark:text-primary">
+                      Companies List
+                    </span>
+                    <Input
+                      placeholder="Enter Topic"
+                      onChange={(e) => {
+                        setCurrentCompany(e.target.value);
+                      }}
+                    />
+
+                    <Button
+                      onClick={() =>
+                        setAddQuestionObject({
+                          ...addQuestionObject,
+                          companies: [
+                            ...addQuestionObject.companies,
+                            currentCompany,
+                          ],
+                        })
+                      }
+                    >
+                      Add New
+                    </Button>
+
+                    <div className="flex gap-2">
+                      {addQuestionObject.companies.map((item, index) => {
+                        return (
+                          <Badge className="flex gap-4" key={index}>
+                            {item}{" "}
+                            <Trash2
+                              className="cursor-pointer"
+                              onClick={() => {
+                                const updatedList =
+                                  addQuestionObject.companies.filter(
+                                    (com) => com !== item
+                                  );
+                                setAddQuestionObject({
+                                  ...addQuestionObject,
+                                  companies: updatedList,
+                                });
+                              }}
+                            />
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </div>
 
                   {/* Add Question Content */}
 
@@ -233,14 +336,14 @@ function Page() {
 
                   <Tabs defaultValue="account" className="w-[400px]">
                     <TabsList>
-                      {languagesList.map((item) => (
+                      {addQuestionObject.codeSnippets.map((item) => (
                         <TabsTrigger value={item.lang}>
                           {item.language}
                         </TabsTrigger>
                       ))}
                     </TabsList>
 
-                    {languagesList.map((item) => (
+                    {addQuestionObject.codeSnippets.map((item) => (
                       <TabsContent value={item.lang}>
                         <Editor
                           height="50vh"
@@ -250,16 +353,18 @@ function Page() {
                           width="80vh"
                           onChange={(e) => {
                             console.log(e);
-                            const updatedList = languagesList.map(
-                              (langItem) => {
+                            const updatedList =
+                              addQuestionObject.codeSnippets.map((langItem) => {
                                 if (langItem.lang === item.lang) {
                                   return { ...langItem, code: e as string };
                                 }
                                 return langItem;
-                              }
-                            );
+                              });
 
-                            setLanguageList(updatedList);
+                            setAddQuestionObject({
+                              ...addQuestionObject,
+                              codeSnippets: updatedList,
+                            });
                           }}
                         />
                       </TabsContent>
@@ -293,27 +398,45 @@ function Page() {
                     />
                     <Button
                       onClick={() =>
-                        setTestCases([...testCases, currentTestCase])
+                        setAddQuestionObject({
+                          ...addQuestionObject,
+                          testCases: [
+                            ...addQuestionObject.testCases,
+                            currentTestCase,
+                          ],
+                        })
                       }
                     >
                       Add New
                     </Button>
 
                     <div className="flex flex-col gap-2">
-                      {testCases.map((item) => {
+                      {addQuestionObject.testCases.map((item) => {
                         console.log(item);
                         return (
-                          <div className="flex gap-2">
-                            {}
+                          <div key={item.input} className="flex gap-2">
                             <span>
-                              Input :- {item.input} && Output :- {item.output}
+                              Input :- <Badge>{item.input}</Badge> && Output :-
+                              <Badge>{item.output}</Badge>
                             </span>
+                            <Trash2
+                              onClick={() => {
+                                const updatedList =
+                                  addQuestionObject.testCases.filter(
+                                    (testCase) => testCase !== item
+                                  );
+                                setAddQuestionObject({
+                                  ...addQuestionObject,
+                                  testCases: updatedList,
+                                });
+                              }}
+                            />
                           </div>
                         );
                       })}
                     </div>
                   </div>
-                </>
+                </div>
               )}
             </div>
           </div>
