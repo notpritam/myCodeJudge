@@ -115,7 +115,10 @@ function Page() {
       ...addQuestionObject,
     };
 
-    const res = await axios.post("/api/questions/add", question);
+    const res = await axios.post(
+      process.env.NEXT_PUBLIC_API_URL + "/questions/add",
+      question
+    );
 
     if (res.status === 200) {
       console.log("Question Added Successfully");
@@ -443,6 +446,8 @@ function Page() {
                       })}
                     </div>
                   </div>
+
+                  <Button onClick={submitQuestion}>Submit Question</Button>
                 </div>
               )}
             </div>
