@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import authRoutes from "../routes/authRoute.js";
 import codeRoutes from "../routes/evaluateCodeRoute.js";
+import questionRoutes from "../routes/questionRoute.js";
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -19,6 +20,7 @@ const configure = (app) => {
 
   app.use("/api/auth", authRoutes);
   app.use("/api/code", codeRoutes);
+  app.use("/api/questions", questionRoutes);
 
   app.use((err, req, res, next) => {
     console.error(err.stack);
