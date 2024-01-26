@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 const codeSnippetSchema = new mongoose.Schema({
+  _id: Number,
   lang: {
     type: String,
     required: true,
@@ -15,8 +16,6 @@ const codeSnippetSchema = new mongoose.Schema({
   },
 });
 
-const CodeSnippet =
-  mongoose.model.CodeSnippet ||
-  mongoose.model("CodeSnippet", codeSnippetSchema);
+const CodeSnippet = mongoose.model("CodeSnippet", codeSnippetSchema);
 
 export default CodeSnippet;

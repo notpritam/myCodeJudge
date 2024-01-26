@@ -3,11 +3,6 @@ import CodeSnippet from "./CodeSnippet.js";
 import TestCases from "./TestCases.js";
 
 const questionSchema = new mongoose.Schema({
-  id: {
-    type: mongoose.Schema.Types.ObjectId,
-    default: mongoose.Types.ObjectId,
-    unique: true,
-  },
   level: {
     type: String,
     required: true,
@@ -43,15 +38,14 @@ const questionSchema = new mongoose.Schema({
     required: true,
   },
   codeSnippets: {
-    type: [CodeSnippet],
+    type: [CodeSnippet.schema],
     required: true,
   },
   testCases: {
-    type: [TestCases],
+    type: [TestCases.schema],
     required: true,
   },
 });
 
-const Question =
-  mongoose.model.Question || mongoose.model("Question", questionSchema);
+const Question = mongoose.model("Question", questionSchema);
 export default Question;

@@ -24,13 +24,13 @@ import axios from "axios";
 
 interface CodeSnippet {
   lang: string;
-  language: string;
+  langSlug: string;
   code: string;
 }
 
 interface TestCase {
   input: string;
-  output: string;
+  expectedOutput: string;
 }
 
 interface Question {
@@ -63,21 +63,21 @@ function Page() {
     content: "",
     codeSnippets: [
       {
-        lang: "javascript",
-        language: "Javascript",
+        langSlug: "javascript",
+        lang: "Javascript",
         code: `function add(a,b){
         return a+b;
       }`,
       },
       {
-        lang: "python",
-        language: "Python",
+        langSlug: "python",
+        lang: "Python",
         code: `def add(a,b):
         return a+b`,
       },
       {
-        lang: "cpp",
-        language: "C++",
+        langSlug: "cpp",
+        lang: "C++",
         code: `int add(int a,int b){}`,
       },
     ],
@@ -88,7 +88,7 @@ function Page() {
 
   const [currentTestCase, setCurrentTestCase] = useState<TestCase>({
     input: "",
-    output: "",
+    expectedOutput: "",
   });
 
   const [currentTopic, setCurrentTopic] = useState<string>("");
@@ -109,6 +109,14 @@ function Page() {
   };
 
   addDummyData();
+
+  const updateContent = (content: string) => {
+    setAddQuestionObject({
+      ...addQuestionObject,
+      content: content,
+    });
+    console.log(content);
+  };
 
   const submitQuestion = async () => {
     const question = {
@@ -340,21 +348,21 @@ function Page() {
 
                   {/* Add Question Content */}
 
-                  <TextEditor />
+                  <TextEditor updateContent={updateContent} />
 
                   {/* Add Code Snippets */}
 
                   <Tabs defaultValue="account" className="w-[400px]">
                     <TabsList>
                       {addQuestionObject.codeSnippets.map((item) => (
-                        <TabsTrigger value={item.lang}>
-                          {item.language}
+                        <TabsTrigger value={item.langSlug}>
+                          {item.lang}
                         </TabsTrigger>
                       ))}
                     </TabsList>
 
                     {addQuestionObject.codeSnippets.map((item) => (
-                      <TabsContent value={item.lang}>
+                      <TabsContent value={item.langSlug}>
                         <Editor
                           height="50vh"
                           defaultLanguage={item.lang}
@@ -402,7 +410,7 @@ function Page() {
                         const value = e.target.value.replace(/\s+/g, "\n"); // Replace spaces with newline characters
                         setCurrentTestCase({
                           ...currentTestCase,
-                          output: value,
+                          expectedOutput: value,
                         });
                       }}
                     />
@@ -427,7 +435,7 @@ function Page() {
                           <div key={item.input} className="flex gap-2">
                             <span>
                               Input :- <Badge>{item.input}</Badge> && Output :-
-                              <Badge>{item.output}</Badge>
+                              <Badge>{item.expectedOutput}</Badge>
                             </span>
                             <Trash2
                               onClick={() => {
