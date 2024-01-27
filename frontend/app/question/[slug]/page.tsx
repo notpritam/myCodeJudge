@@ -2,22 +2,68 @@
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 import Editor, { Monaco } from "@monaco-editor/react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+
+interface CodeSnippet {
+  lang: string;
+  langSlug: string;
+  code: string;
+}
+
+interface TestCase {
+  input: string;
+  expectedOutput: string;
+}
+
+interface Question {
+  _id: string;
+  level: string;
+  topics: string[];
+  companies: string[];
+  title: string;
+  titleSlug: string;
+  likes: number;
+  dislikes: number;
+  content: string;
+  codeSnippets: CodeSnippet[];
+  testCases: TestCase;
+  __v: number;
+}
 
 function Page({ params }: { params: { slug: string } }) {
   const [userData, setUserData] = useState({} as any);
+  const [questionData, setQuestionData] = useState<Question>({} as Question);
   console.log(params.slug);
+  const [loading, setLoading] = useState(false);
+
+  const getQuestion = async () => {
+    const result = await axios.get(
+      process.env.NEXT_PUBLIC_API_URL + "/questions/get/" + params.slug
+    );
+    console.log(result);
+    setQuestionData(result.data);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    getQuestion();
+  }, []);
 
   const evaluateCode = async () => {
     const token = localStorage.getItem("token");
     console.log(token, "frontend token");
-    const questionData = {
+    const code = {
       questionId: params.slug,
-      code: `code`,
-      language: `javascript`,
+      code: questionData.codeSnippets[0].code,
+      language: `java`,
+      questionDetails: questionData,
     };
     const result = await axios.post(
-      process.env.NEXT_PUBLIC_API_URL + "/code/submit-code",
-      questionData,
+      process.env.NEXT_PUBLIC_API_URL + "/code/submit-code/" + params.slug,
+      code,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -31,212 +77,6 @@ function Page({ params }: { params: { slug: string } }) {
 
   const editorRef = useRef(null);
 
-  const someJSCodeExample = `
-  const sum = (a, b) => {
-    console.log(a + b);
-  };
-`;
-
-  const someCSSCodeExample = `
-  @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    outline: none;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  *::-webkit-scrollbar {
-    display: none;
-  }
-
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-      sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  [type=reset], [type=submit], button, html [type=button] {
-      -webkit-appearance: button;
-  }
-
-  [type=button]{
-    -webkit-appearance: none;
-  }
-
-  .full-width {
-    width: 100%;
-  }
-  .full-height {
-    height: 100%;
-  }
-  .full-size {
-    width: 100%;
-    height: 100%;
-  }
-
-  .ql-editor a {
-    color: rgba(255, 255, 255, 0.20);
-    cursor: pointer;
-    padding-left: 8px;
-    padding-right: 8px;
-    text-decoration: none;
-  }
-  .ql-editor ul, .ql-editor li, .ql-editor ol {
-    margin-left: 16px;
-  }
-  .ql-editor object {
-    color: #d32f2f;
-  }
-  .ql-editor blockquote {
-    border-left: 3px solid rgba(255, 255, 255, 0.12);
-    padding-top: 8px;
-    padding-left: 24px;
-    padding-right: 16px;
-    padding-bottom: 8px;
-  }
-  .ql-editor .ql-align-center {
-    text-align: center;
-  }
-  .ql-editor .ql-align-justify {
-    text-align: justify;
-  }
-  .ql-editor .ql-align-right {
-    text-align: right;
-  }
-  .ql-editor a:hover {
-    text-decoration: underline;
-  }
-`;
-
-  const someHTMLCodeExample = `
-  <!DOCTYPE html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-      <!-- https://web.dev/uses-rel-preconnect -->
-      <link rel="preconnect" href="https://storage.googleapis.com">
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <meta name="theme-color" content="#111" />
-
-      <meta
-        name="description"
-        content="Wlist"
-        data-react-helmet="true"
-      />
-      <meta
-        property="og:title"
-        content="Wlist"
-        data-react-helmet="true"
-      >
-      <meta
-        property="og:description"
-        content="Wlist"
-        data-react-helmet="true"
-      >
-      <meta
-        property="og:url"
-        content="%PUBLIC_URL%"
-        data-react-helmet="true"
-      >
-      <meta
-        property="og:image"
-        content="%PUBLIC_URL%/images/cover.png"
-        data-react-helmet="true"
-      />
-      <meta
-        name="twitter:card"
-        content="summary"
-        data-react-helmet="true"
-      />
-      <meta property="og:type" content="website" />
-      <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-      <!--
-        manifest.json provides metadata used when your web app is installed on a
-        user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-      -->
-      <link rel="manifest" href="%PUBLIC_URL%/manifest.json" crossorigin="use-credentials" />
-      <!-- https://web.dev/defer-non-critical-css/ -->
-      <link rel="preload" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-
-      <title>Wlist</title>
-
-      <!-- ie -->
-      <script type="text/javascript">
-        var ua = navigator.userAgent;
-        var is_ie = ua.indexOf('MSIE ') > -1 || ua.indexOf('Trident/') > -1;
-
-        if (is_ie) {
-          document.ie = 'true';
-
-          var ie_script = document.createElement('script');
-          var ie_styles = document.createElement('link');
-
-          ie_script.src = 'no-ie/init.js';
-          ie_styles.rel = 'stylesheet';
-          ie_styles.href = 'no-ie/styles.css';
-
-          function injectScripts() {
-            document.body.innerHTML = '';
-            document.body.appendChild(ie_styles);
-            document.body.appendChild(ie_script);
-          }
-
-          if (document.addEventListener) {
-            document.addEventListener('DOMContentLoaded', injectScripts);
-          } else { // before IE 9
-            document.attachEvent('DOMContentLoaded', injectScripts);
-          }
-
-        }
-      </script>
-    </head>
-    <body>
-      <noscript>You need to enable JavaScript to run this app.</noscript>
-      <script type="text/javascript">
-        // set the body color before app initialization, to avoid blinking
-        var themeMode = localStorage.getItem('theme-mode');
-        var initialBodyStyles = document.createElement('style');
-        var currentThemeColor = themeMode === 'light' ? '#fafafa': '#111';
-        initialBodyStyles.innerText = 'body { background-color: ' + currentThemeColor + ' }';
-        document.head.appendChild(initialBodyStyles);
-
-        // also set meta[name="theme-color"] content
-        var metaTheme = document.querySelector('meta[name="theme-color"]');
-
-        metaTheme.content = currentThemeColor;
-      </script>
-      <div id="root"></div>
-    </body>
-  </html>
-`;
-
-  const files = {
-    "script.js": {
-      name: "script.js",
-      language: "javascript",
-      value: someJSCodeExample,
-    },
-    "style.css": {
-      name: "style.css",
-      language: "css",
-      value: someCSSCodeExample,
-    },
-    "index.html": {
-      name: "index.html",
-      language: "html",
-      value: someHTMLCodeExample,
-    },
-  };
-
-  const [file, setFile] = useState(files["script.js"]);
-
   function handleEditorDidMount(editor: any, monaco: Monaco) {
     // here is the editor instance
     // you can store it in `useRef` for further usage
@@ -245,17 +85,74 @@ function Page({ params }: { params: { slug: string } }) {
   }
 
   return (
-    <div>
-      <Editor
-        height="80vh"
-        defaultLanguage={file.language}
-        defaultValue={file.value}
-        theme="vs-dark"
-        onMount={handleEditorDidMount}
-      />
+    <div className="p-4 h-screen w-screen dark bg-black">
+      <header className="flex justify-between border-b-2 pb-2">
+        <span className="font-bold dark:text-primary tracking-wider text-[18px]">
+          MyCodeJudge
+        </span>
 
-      <button onClick={evaluateCode}>Evaluate Code</button>
-      {userData && <p>{userData.body}</p>}
+        <Avatar>
+          <AvatarImage src="https://github.com/shadcn.png" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+      </header>
+      {loading ? (
+        <p>Loading...</p>
+      ) : (
+        <>
+          <div className="w-full p-4 flex gap-8">
+            <div
+              className="bg-gray-200  p-4"
+              dangerouslySetInnerHTML={{
+                __html: questionData.content?.replace(
+                  `<div class="editor-input" contenteditable="true" role="textbox" spellcheck="true" data-lexical-editor="true" style="user-select: text; white-space: pre-wrap; word-break: break-word;"><p class="editor-paragraph ltr" dir="ltr" style="text-align: start;">`,
+                  ""
+                ),
+              }}
+            ></div>
+            <Tabs defaultValue="java" className="">
+              <TabsList>
+                {questionData?.codeSnippets?.map((item) => (
+                  <TabsTrigger value={item.langSlug}>{item.lang}</TabsTrigger>
+                ))}
+              </TabsList>
+
+              {questionData.codeSnippets?.map((item) => (
+                <TabsContent value={item.langSlug}>
+                  <Editor
+                    height="60vh"
+                    defaultLanguage={
+                      item.lang == "C++" ? "cpp" : item.lang.toLowerCase()
+                    }
+                    defaultValue={item.code}
+                    theme="vs-dark"
+                    width="100vh"
+                    onChange={(e) => {
+                      console.log(e);
+                      const updatedList = questionData.codeSnippets.map(
+                        (langItem) => {
+                          if (langItem.lang === item.lang) {
+                            return { ...langItem, code: e as string };
+                          }
+                          return langItem;
+                        }
+                      );
+                      setQuestionData({
+                        ...questionData,
+                        codeSnippets: updatedList,
+                      });
+                    }}
+                  />
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+        </>
+      )}
+
+      <div className="flex justify-end w-full pt-8">
+        <Button onClick={evaluateCode}>Evaluate Code</Button>
+      </div>
     </div>
   );
 }

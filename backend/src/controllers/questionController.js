@@ -14,10 +14,7 @@ export const addQuestion = async (req, res) => {
     const codeSnippets = req.body.codeSnippets.map(
       (snippet) => new CodeSnippet(snippet)
     );
-    const testCases = req.body.testCases.map(
-      (testCase) => new TestCases(testCase)
-    );
-
+    const testCases = new TestCases(req.body.testCases);
     // Create a new question instance using the request body, including CodeSnippet and TestCases
     const newQuestion = new Question({
       ...req.body,
@@ -31,6 +28,23 @@ export const addQuestion = async (req, res) => {
     res.status(201).json(savedQuestion);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
+    res.status(500).json({ error: `${error}` });
+  }
+};
+
+export const getQuestion = async (req, res) => {
+  try {
+    console.log(req.params.slug);
+    const question = await Question.findOne({ "title-slug": req.params.slug });
+    console.log(question);
+
+    if (!question) {
+      res.status(404).json({ error: "Question not found" });
+    } else {
+      res.status(200).json(question);
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: `${error}` });
   }
 };

@@ -1,7 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Code, Delete, Plus, Trash2, Users } from "lucide-react";
+import { Code, Plus, Trash2, Users } from "lucide-react";
 import React, { useState } from "react";
 import { DataTable } from "./data-table";
 import { Payment, columns } from "./columns";
@@ -10,8 +10,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
@@ -62,6 +60,13 @@ function Page() {
     level: "",
     content: "",
     codeSnippets: [
+      {
+        langSlug: "java",
+        lang: "Java",
+        code: `function add(a,b){
+        return a+b;
+      }`,
+      },
       {
         langSlug: "javascript",
         lang: "Javascript",
@@ -373,7 +378,9 @@ function Page() {
                       <TabsContent value={item.langSlug}>
                         <Editor
                           height="50vh"
-                          defaultLanguage={item.lang}
+                          defaultLanguage={
+                            item.lang == "C++" ? "cpp" : item.lang.toLowerCase()
+                          }
                           defaultValue={item.code}
                           theme="vs-dark"
                           width="80vh"

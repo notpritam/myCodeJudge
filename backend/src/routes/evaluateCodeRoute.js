@@ -4,6 +4,6 @@ import { authenticateJWT } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/submit-code", authenticateJWT, submitCode);
+router.post("/submit-code/:slug", submitCode);
 
 export default router;

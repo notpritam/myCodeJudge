@@ -6,9 +6,10 @@ import { text } from "express";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const handleJavaCode = (req, res, userCode, testCases) => {
+export const handleJavaCode = (req, res, userCode, testCases) => {
   const fileName = "Main.java";
-  fs.writeFileSync(fileName, userCode, "utf-8");
+  const filePath = `${__dirname}/${fileName}`;
+  fs.writeFileSync(filePath, userCode, "utf-8");
 
   const compileCommand = `docker run --rm -v ${__dirname}:/code coderunner_java javac ${fileName}`;
 
@@ -36,9 +37,9 @@ const handleJavaCode = (req, res, userCode, testCases) => {
   }
 
   function runCode() {
-    const customInput = testCases.input; // Customize this input
+    const customInput = testCases.input.replace("\r", ""); // Customize this input
     const inputFilePath = "input.txt";
-    const output = testCases.expectedOutput;
+    const expectedOutput = testCases.expectedOutput.replace("\r", "");
 
     fs.writeFileSync(inputFilePath, customInput, "utf-8");
 
@@ -66,7 +67,7 @@ const handleJavaCode = (req, res, userCode, testCases) => {
 
     dockerContainer.stdout.on("data", (data) => {
       const output = data.toString();
-      // console.log(`Output: \n${output}`);
+      //   console.log(`Output: \n${output}`);
       outputValue += output;
       // fs.writeFileSync(outputFilePath, output, "utf-8");
 
@@ -81,7 +82,7 @@ const handleJavaCode = (req, res, userCode, testCases) => {
       console.log(`Output: \n${outputValue}`);
       console.log(`Docker container closed with code ${code}`);
 
-      if (outputValue === output) {
+      if (expectedOutput === outputValue) {
         res.status(200).json({ message: "All Test Cases Passed" });
       } else {
         res.status(200).json({ message: "Test Cases Failed" });
