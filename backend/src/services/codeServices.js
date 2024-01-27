@@ -2,7 +2,6 @@ import fs from "fs";
 import { spawn } from "child_process";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
-import { text } from "express";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -37,7 +36,7 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
   }
 
   function runCode() {
-    const customInput = testCases.input.replace("\r", ""); // Customize this input
+    const customInput = testCases.input.replace("\r", "");
     const inputFilePath = "input.txt";
     const expectedOutput = testCases.expectedOutput.replace("\r", "");
 
@@ -79,10 +78,11 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
     });
 
     dockerContainer.on("close", (code) => {
+      console.log(`Expected Output: \n${expectedOutput}`);
       console.log(`Output: \n${outputValue}`);
       console.log(`Docker container closed with code ${code}`);
 
-      if (expectedOutput === outputValue) {
+      if (expectedOutput.trim() === outputValue.trim()) {
         res.status(200).json({ message: "All Test Cases Passed" });
       } else {
         res.status(200).json({ message: "Test Cases Failed" });
