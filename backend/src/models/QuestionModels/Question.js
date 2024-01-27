@@ -42,7 +42,7 @@ const questionSchema = new mongoose.Schema({
     required: true,
   },
   testCases: {
-    type: [TestCases.schema],
+    type: TestCases.schema,
     required: true,
   },
 });

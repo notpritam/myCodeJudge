@@ -41,7 +41,7 @@ interface Question {
   codeSnippets: CodeSnippet[];
   topics: string[];
   companies: string[];
-  testCases: TestCase[];
+  testCases: TestCase;
 }
 
 function Page() {
@@ -83,7 +83,10 @@ function Page() {
     ],
     companies: [],
     topics: [],
-    testCases: [],
+    testCases: {
+      input: "",
+      expectedOutput: "",
+    },
   });
 
   const [currentTestCase, setCurrentTestCase] = useState<TestCase>({
@@ -182,15 +185,20 @@ function Page() {
                 <div className="flex flex-col gap-4">
                   <Input
                     placeholder="Enter Question Title"
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const titleSlug = e.target.value
+                        .replace(/\s+/g, "-")
+                        .toLowerCase();
                       setAddQuestionObject({
                         ...addQuestionObject,
                         title: e.target.value,
-                      })
-                    }
+                        "title-slug": titleSlug,
+                      });
+                    }}
                   />
                   <Input
                     placeholder="Enter Question Slug"
+                    value={addQuestionObject["title-slug"]}
                     onChange={(e) =>
                       setAddQuestionObject({
                         ...addQuestionObject,
@@ -390,70 +398,51 @@ function Page() {
                   </Tabs>
 
                   {/* Add TestCases Now  */}
-                  <div className="flex flex-col gap-2">
-                    <span className="text-[1.5rem] dark:text-primary">
-                      Test Cases
-                    </span>
-                    <Input
-                      placeholder="Enter Input"
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\s+/g, "\n"); // Replace spaces with newline characters
-                        setCurrentTestCase({
-                          ...currentTestCase,
-                          input: value,
-                        });
-                      }}
-                    />
-                    <Input
-                      placeholder="Enter Output"
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\s+/g, "\n"); // Replace spaces with newline characters
-                        setCurrentTestCase({
-                          ...currentTestCase,
-                          expectedOutput: value,
-                        });
-                      }}
-                    />
-                    <Button
-                      onClick={() =>
-                        setAddQuestionObject({
-                          ...addQuestionObject,
-                          testCases: [
-                            ...addQuestionObject.testCases,
-                            currentTestCase,
-                          ],
-                        })
-                      }
-                    >
-                      Add New
-                    </Button>
+                  <Tabs defaultValue="input" className="w-[400px]">
+                    <TabsList>
+                      <TabsTrigger value="input">Input</TabsTrigger>
+                      <TabsTrigger value="ouput">Output</TabsTrigger>
+                    </TabsList>
 
-                    <div className="flex flex-col gap-2">
-                      {addQuestionObject.testCases.map((item) => {
-                        console.log(item);
-                        return (
-                          <div key={item.input} className="flex gap-2">
-                            <span>
-                              Input :- <Badge>{item.input}</Badge> && Output :-
-                              <Badge>{item.expectedOutput}</Badge>
-                            </span>
-                            <Trash2
-                              onClick={() => {
-                                const updatedList =
-                                  addQuestionObject.testCases.filter(
-                                    (testCase) => testCase !== item
-                                  );
-                                setAddQuestionObject({
-                                  ...addQuestionObject,
-                                  testCases: updatedList,
-                                });
-                              }}
-                            />
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
+                    <TabsContent value="input">
+                      <Editor
+                        height="50vh"
+                        defaultValue={addQuestionObject.testCases.input}
+                        theme="vs-dark"
+                        width="80vh"
+                        onChange={(e) => {
+                          console.log(e);
+                          setAddQuestionObject({
+                            ...addQuestionObject,
+                            testCases: {
+                              ...addQuestionObject.testCases,
+                              input: e as string,
+                            },
+                          });
+                        }}
+                      />
+                    </TabsContent>
+                    <TabsContent value="ouput">
+                      <Editor
+                        height="50vh"
+                        defaultValue={
+                          addQuestionObject.testCases.expectedOutput
+                        }
+                        theme="vs-dark"
+                        width="80vh"
+                        onChange={(e) => {
+                          console.log(e);
+                          setAddQuestionObject({
+                            ...addQuestionObject,
+                            testCases: {
+                              ...addQuestionObject.testCases,
+                              expectedOutput: e as string,
+                            },
+                          });
+                        }}
+                      />
+                    </TabsContent>
+                  </Tabs>
 
                   <Button onClick={submitQuestion}>Submit Question</Button>
                 </div>
