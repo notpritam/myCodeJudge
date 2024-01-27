@@ -20,9 +20,11 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
       console.log(data.toString());
     });
 
+    var compliationError = [];
+
     compileProcess.stderr.on("data", (stderr) => {
       console.error(`Compilation error: ${stderr}`);
-      res.status(500).json({ compileError: `${stderr}` });
+      compliationError.push(stderr);
     });
 
     compileProcess.on("close", (code) => {
@@ -31,6 +33,13 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
         runCode();
       } else {
         console.error(`Compilation failed with code ${code}`);
+        res.status(200).json({
+          message: "Compilation Error : " + compliationError.toString(),
+          error: true,
+          outputValue: "outputValue",
+          input: "",
+          expectedOutput: "",
+        });
       }
     });
   }
@@ -83,9 +92,21 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
       console.log(`Docker container closed with code ${code}`);
 
       if (expectedOutput.trim() === outputValue.trim()) {
-        res.status(200).json({ message: "All Test Cases Passed" });
+        res.status(200).json({
+          message: "All Test Cases Passed",
+          outputValue: outputValue,
+          error: false,
+          input: customInput,
+          expectedOutput: expectedOutput,
+        });
       } else {
-        res.status(200).json({ message: "Test Cases Failed" });
+        res.status(200).json({
+          message: "Test Cases Failed",
+          error: true,
+          outputValue: outputValue,
+          input: customInput,
+          expectedOutput: expectedOutput,
+        });
       }
     });
   }

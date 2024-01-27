@@ -5,6 +5,7 @@ import Editor, { Monaco } from "@monaco-editor/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface CodeSnippet {
   lang: string;
@@ -32,8 +33,18 @@ interface Question {
   __v: number;
 }
 
+interface CodeResponse {
+  error: boolean;
+  message: string;
+  expectedOutput: string;
+  input: string;
+  outputValue: string;
+}
+
 function Page({ params }: { params: { slug: string } }) {
-  const [userData, setUserData] = useState({} as any);
+  const [codeResponse, setCodeResponse] = useState<CodeResponse>(
+    {} as CodeResponse
+  );
   const [questionData, setQuestionData] = useState<Question>({} as Question);
   console.log(params.slug);
   const [loading, setLoading] = useState(false);
@@ -61,18 +72,29 @@ function Page({ params }: { params: { slug: string } }) {
       language: `java`,
       questionDetails: questionData,
     };
-    const result = await axios.post(
-      process.env.NEXT_PUBLIC_API_URL + "/code/submit-code/" + params.slug,
-      code,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+    try {
+      const result = await axios.post(
+        process.env.NEXT_PUBLIC_API_URL + "/code/submit-code/" + params.slug,
+        code,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    setUserData(result.data);
-    console.log(result);
+      console.log(result.data);
+
+      if (!result.data.error) {
+        toast.success("Code Evaluated Successfully");
+      } else {
+        toast.error(result.data.message);
+      }
+
+      setCodeResponse(result.data);
+    } catch (e: any) {
+      toast.error(e.message as string);
+    }
   };
 
   const editorRef = useRef(null);
@@ -150,8 +172,34 @@ function Page({ params }: { params: { slug: string } }) {
         </>
       )}
 
-      <div className="flex justify-end w-full pt-8">
-        <Button onClick={evaluateCode}>Evaluate Code</Button>
+      <div className="flex justify-between">
+        <div className="flex flex-col gap-4 text-white">
+          {codeResponse.error ? (
+            <>
+              <span>
+                <strong>Error</strong> : {codeResponse.message}
+              </span>
+            </>
+          ) : (
+            <>
+              <span>
+                <strong>Success</strong> : {codeResponse.message}
+              </span>
+              <span>
+                <strong>Input</strong> : {codeResponse.input}
+              </span>
+              <span>
+                <strong>Expected Output</strong> : {codeResponse.expectedOutput}
+              </span>
+              <span>
+                <strong>Output</strong> : {codeResponse.outputValue}
+              </span>
+            </>
+          )}
+        </div>
+        <div className="flex justify-end w-full pt-8">
+          <Button onClick={evaluateCode}>Evaluate Code</Button>
+        </div>
       </div>
     </div>
   );
