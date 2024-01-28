@@ -1,14 +1,52 @@
 "use client";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import axios from "axios";
+import { set } from "date-fns";
 import { MoreVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
+interface CodeSnippet {
+  lang: string;
+  langSlug: string;
+  code: string;
+}
+
+interface TestCase {
+  input: string;
+  expectedOutput: string;
+}
+
+interface Question {
+  _id: string;
+  level: string;
+  topics: string[];
+  companies: string[];
+  title: string;
+  "title-slug": string;
+  likes: number;
+  dislikes: number;
+  content: string;
+  codeSnippets: CodeSnippet[];
+  testCases: TestCase;
+  __v: number;
+}
+
+interface CodeResponse {
+  error: boolean;
+  message: string;
+  expectedOutput: string;
+  success: boolean;
+  input: string;
+  outputValue: string;
+}
 
 export default function Home() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
+  const [loading, setLoading] = React.useState<boolean>(true);
   const categories = [
     { name: "Array", count: 1374 },
     { name: "String", count: 612 },
@@ -32,34 +70,35 @@ export default function Home() {
     { name: "Prefix Sum", count: 127 },
   ];
 
-  const questions = [
-    {
-      id: "1406",
-      title: "Stone Game III",
-      difficulty: "Hard",
-      acceptance_rate: "64.6%",
-    },
-    { id: "1", title: "Two Sum", difficulty: "Easy", acceptance_rate: "49.9%" },
-    {
-      id: "2",
-      title: "Add Two Numbers",
-      difficulty: "Medium",
-      acceptance_rate: "40.5%",
-    },
-    {
-      id: "3",
-      title: "Longest Substring Without Repeating Characters",
-      difficulty: "Medium",
-      acceptance_rate: "33.8%",
-    },
-    {
-      id: "4",
-      title: "Median of Two Sorted Arrays",
-      difficulty: "Hard",
-      acceptance_rate: "36.5%",
-    },
-  ];
+  // const questions = [
+  //   {
+  //     id: "1406",
+  //     title: "Stone Game III",
+  //     difficulty: "Hard",
+  //     acceptance_rate: "64.6%",
+  //   },
+  //   { id: "1", title: "Two Sum", difficulty: "Easy", acceptance_rate: "49.9%" },
+  //   {
+  //     id: "2",
+  //     title: "Add Two Numbers",
+  //     difficulty: "Medium",
+  //     acceptance_rate: "40.5%",
+  //   },
+  //   {
+  //     id: "3",
+  //     title: "Longest Substring Without Repeating Characters",
+  //     difficulty: "Medium",
+  //     acceptance_rate: "33.8%",
+  //   },
+  //   {
+  //     id: "4",
+  //     title: "Median of Two Sorted Arrays",
+  //     difficulty: "Hard",
+  //     acceptance_rate: "36.5%",
+  //   },
+  // ];
 
+  const [questions, setQuestions] = React.useState<Question[]>([]);
   const getDifficultyColor = (difficulty: string) => {
     if (difficulty == "Easy") {
       return "text-green-500";
@@ -69,6 +108,22 @@ export default function Home() {
       return "text-red-500";
     }
   };
+
+  const getQuestions = async () => {
+    try {
+      const result = await axios.get(
+        process.env.NEXT_PUBLIC_API_URL + "/questions/get"
+      );
+      setQuestions(result.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getQuestions();
+  }, []);
 
   return (
     <main className="flex h-screen dark bg-black p-4  w-screen flex-col ">
@@ -106,26 +161,52 @@ export default function Home() {
             </span>
             <span className="w-[20%] text-[1.25rem] tracking-widest text-gray-600"></span>
           </div>
-          {questions.map((item, i) => (
-            <div
-              className={cn(
-                i % 2 == 0 ? "bg-gray-500" : "",
-                "py-[10px] w-full flex bg-opacity-30 text-gray-300 px-2"
-              )}
-            >
-              <Link href="/question/two-sum" className="w-full pl-2">
-                {item.title}
-              </Link>
-              <span
-                className={cn(getDifficultyColor(item.difficulty), "w-[20%] ")}
-              >
-                {item.difficulty}
-              </span>
-              <span className="w-[20%] text-opacity-40 cursor-pointer">
-                <MoreVertical />
-              </span>
-            </div>
-          ))}
+
+          {loading ? (
+            <>
+              {Array.from({ length: 5 }).map((item, i) => (
+                <div
+                  className={cn(
+                    i % 2 == 0 ? "" : "",
+                    "py-[10px] w-full flex justify-between bg-opacity-30 text-gray-300 px-2"
+                  )}
+                >
+                  <Skeleton className="w-[60%] h-[20px]" />
+                  <Skeleton className="w-[20%] h-[20px]" />
+                  <Skeleton className="w-[10%] h-[20px]" />
+                </div>
+              ))}
+            </>
+          ) : (
+            <>
+              {questions?.map((item, i) => (
+                <div
+                  className={cn(
+                    i % 2 == 0 ? "bg-gray-500" : "",
+                    "py-[10px] w-full flex bg-opacity-30 text-gray-300 px-2"
+                  )}
+                >
+                  <Link
+                    href={`/question/${item["title-slug"]}`}
+                    className="w-full pl-2"
+                  >
+                    {item.title}
+                  </Link>
+                  <span
+                    className={cn(
+                      getDifficultyColor(item.level),
+                      "w-[20%] capitalize "
+                    )}
+                  >
+                    {item.level}
+                  </span>
+                  <span className="w-[20%] text-opacity-40 cursor-pointer">
+                    <MoreVertical />
+                  </span>
+                </div>
+              ))}
+            </>
+          )}
         </div>
         <div className="flex-[2]">
           <Calendar
