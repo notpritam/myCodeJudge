@@ -14,6 +14,7 @@ public class Main {
                 }
                 numIndices.put(nums[i], i);
             }
+            return null;
         }
     }
 

@@ -20,6 +20,7 @@ import {
 import { ChevronsDownUp } from "lucide-react";
 import { set } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
+import Link from "next/link";
 
 interface CodeSnippet {
   lang: string;
@@ -134,9 +135,12 @@ function Page({ params }: { params: { slug: string } }) {
   return (
     <div className="p-4 h-screen w-screen flex flex-col overflow-hidden dark bg-black">
       <header className="flex justify-between border-b-2 pb-2">
-        <span className="font-bold dark:text-primary tracking-wider text-[18px]">
+        <Link
+          href={"/"}
+          className="font-bold dark:text-primary tracking-wider text-[18px]"
+        >
           MyCodeJudge
-        </span>
+        </Link>
 
         <Avatar>
           <AvatarImage src="https://github.com/shadcn.png" />
@@ -271,7 +275,7 @@ function Page({ params }: { params: { slug: string } }) {
                           },
                           fontSize: 16,
 
-                          cursorStyle: "block",
+                          // cursorStyle: "block",
                           wordWrap: "on",
                         }}
                         onChange={(e) => {
