@@ -143,106 +143,108 @@ function Page({ params }: { params: { slug: string } }) {
         </Avatar>
       </header>
 
-      {/* <ResizablePanelGroup
+      <ResizablePanelGroup
         direction="horizontal"
-        className="max-w-md rounded-lg border"
+        className="min-h-screen m-4 border-none  w-full rounded-lg border"
       >
-        <ResizablePanel defaultSize={50}>
-          <div className="flex h-[200px] items-center justify-center p-6">
-            <span className="font-semibold">One</span>
+        <ResizablePanel className="h-full w-full">
+          <div className="h-full w-full">
+            <Tabs defaultValue="des" className="h-full">
+              <TabsList>
+                <TabsTrigger value={"des"}>Description</TabsTrigger>
+                <TabsTrigger value={"discussion"}>Disscussion</TabsTrigger>
+                <TabsTrigger value={"solution"}>Solutions</TabsTrigger>
+                <TabsTrigger value={"submission"}>Submission</TabsTrigger>
+              </TabsList>
+
+              <TabsContent className="h-full" value={"des"}>
+                <div
+                  className="bg-gray-200 h-[100%] overflow-y-auto  p-4"
+                  dangerouslySetInnerHTML={{
+                    __html: questionData.content?.replace(
+                      `<div class="editor-input" contenteditable="true" role="textbox" spellcheck="true" data-lexical-editor="true" style="user-select: text; white-space: pre-wrap; word-break: break-word;"><p class="editor-paragraph ltr" dir="ltr" style="text-align: start;">`,
+                      ""
+                    ),
+                  }}
+                ></div>
+              </TabsContent>
+              <TabsContent className="h-full w-full" value={"discussion"}>
+                <div className="w-full">sdkjs</div>
+              </TabsContent>
+              <TabsContent
+                className="h-full w-full"
+                value={"solution"}
+              ></TabsContent>
+              <TabsContent
+                className="h-full w-full"
+                value={"submission"}
+              ></TabsContent>
+            </Tabs>
           </div>
         </ResizablePanel>
-        <ResizableHandle />
-        <ResizablePanel defaultSize={50}>
+        <ResizableHandle className="w-[4px] bg-gray-500" />
+        <ResizablePanel className=" h-full w-full">
           <ResizablePanelGroup direction="vertical">
-            <ResizablePanel defaultSize={25}>
-              <div className="flex h-full items-center justify-center p-6">
-                <span className="font-semibold">Two</span>
-              </div>
-            </ResizablePanel>
-            <ResizableHandle />
-            <ResizablePanel defaultSize={75}>
-              <div className="flex h-full items-center justify-center p-6">
-                <span className="font-semibold">Three</span>
-              </div>
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </ResizablePanel>
-      </ResizablePanelGroup> */}
-
-      <main className="flex h-[100%] p-4 gap-8">
-        <div className="h-full w-full">
-          <Tabs defaultValue="des" className="h-full">
-            <TabsList>
-              <TabsTrigger value={"des"}>Description</TabsTrigger>
-              <TabsTrigger value={"discussion"}>Disscussion</TabsTrigger>
-              <TabsTrigger value={"solution"}>Solutions</TabsTrigger>
-              <TabsTrigger value={"submission"}>Submission</TabsTrigger>
-            </TabsList>
-
-            <TabsContent className="h-full" value={"des"}>
-              <div
-                className="bg-gray-200 h-[100%] overflow-y-auto  p-4"
-                dangerouslySetInnerHTML={{
-                  __html: questionData.content?.replace(
-                    `<div class="editor-input" contenteditable="true" role="textbox" spellcheck="true" data-lexical-editor="true" style="user-select: text; white-space: pre-wrap; word-break: break-word;"><p class="editor-paragraph ltr" dir="ltr" style="text-align: start;">`,
-                    ""
-                  ),
-                }}
-              ></div>
-            </TabsContent>
-            <TabsContent className="h-full w-full" value={"discussion"}>
-              <div className="w-full">sdkjs</div>
-            </TabsContent>
-            <TabsContent
-              className="h-full w-full"
-              value={"solution"}
-            ></TabsContent>
-            <TabsContent
-              className="h-full w-full"
-              value={"submission"}
-            ></TabsContent>
-          </Tabs>
-        </div>
-
-        <Tabs defaultValue="java" className="h-full overflow-hidden w-full">
-          <TabsList>
-            {questionData?.codeSnippets?.map((item) => (
-              <TabsTrigger value={item.langSlug}>{item.lang}</TabsTrigger>
-            ))}
-          </TabsList>
-
-          {questionData.codeSnippets?.map((item) => (
-            <TabsContent
-              className="h-full overflow-y-auto"
-              value={item.langSlug}
+            <ResizablePanel
+              style={{ flex: showConsole ? "70 1 0px" : "85 1 0px" }}
+              className={showConsole ? "flex-[70]" : "flex-[85]"}
+              defaultSize={85}
             >
-              <Editor
-                height={showConsole ? "70%" : "87%"}
-                defaultLanguage={
-                  item.lang == "C++" ? "cpp" : item.lang.toLowerCase()
-                }
-                defaultValue={item.code}
-                theme="vs-dark"
-                width="100vh"
-                onChange={(e) => {
-                  console.log(e);
-                  const updatedList = questionData.codeSnippets.map(
-                    (langItem) => {
-                      if (langItem.lang === item.lang) {
-                        return { ...langItem, code: e as string };
+              <Tabs
+                defaultValue="java"
+                className="h-full overflow-hidden w-full"
+              >
+                <TabsList>
+                  {questionData?.codeSnippets?.map((item) => (
+                    <TabsTrigger value={item.langSlug}>{item.lang}</TabsTrigger>
+                  ))}
+                </TabsList>
+
+                {questionData.codeSnippets?.map((item) => (
+                  <TabsContent
+                    className="h-full overflow-y-auto"
+                    value={item.langSlug}
+                  >
+                    <Editor
+                      height={"100%"}
+                      defaultLanguage={
+                        item.lang == "C++" ? "cpp" : item.lang.toLowerCase()
                       }
-                      return langItem;
-                    }
-                  );
-                  setQuestionData({
-                    ...questionData,
-                    codeSnippets: updatedList,
-                  });
-                }}
-              />
-              <Collapsible open={showConsole} className="dark text-white">
-                <CollapsibleTrigger className="flex justify-between w-full p-4">
+                      defaultValue={item.code}
+                      theme="vs-dark"
+                      width="100%"
+                      onChange={(e) => {
+                        console.log(e);
+                        const updatedList = questionData.codeSnippets.map(
+                          (langItem) => {
+                            if (langItem.lang === item.lang) {
+                              return { ...langItem, code: e as string };
+                            }
+                            return langItem;
+                          }
+                        );
+                        setQuestionData({
+                          ...questionData,
+                          codeSnippets: updatedList,
+                        });
+                      }}
+                    />
+                  </TabsContent>
+                ))}
+              </Tabs>
+            </ResizablePanel>
+            <ResizableHandle className="h-[1.5rem] bg-gray-500" />
+            <ResizablePanel
+              style={{ flex: showConsole ? "30 1 0px" : "15 1 0px" }}
+              // className={showConsole ? "flex-[30]" : "flex-[15]"}
+              // defaultSize={15}
+              className="overfow-hidden w-full"
+            >
+              <Collapsible
+                open={showConsole}
+                className="dark text-white overflow-hidden w-full h-full"
+              >
+                <CollapsibleTrigger className="flex justify-between w-full p-4 pb-0">
                   <span className="flex gap-4">
                     Console{" "}
                     <ChevronsDownUp
@@ -252,7 +254,7 @@ function Page({ params }: { params: { slug: string } }) {
                   {/* <Button onClick={evaluateCode}>Run</Button> */}
                   <Button
                     disabled={evaluating}
-                    className="bg-green-700"
+                    className="bg-green-700 text-white"
                     onClick={() => {
                       evaluateCode();
                       setShowConsole(true);
@@ -261,7 +263,7 @@ function Page({ params }: { params: { slug: string } }) {
                     {evaluating ? "Evaluating..." : "Submit"}
                   </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="h-full ">
+                <CollapsibleContent className="h-full  p-8 pt-0 overflow-y-auto w-full">
                   {evaluating ? (
                     "Evaluating..."
                   ) : (
@@ -307,10 +309,12 @@ function Page({ params }: { params: { slug: string } }) {
                   )}
                 </CollapsibleContent>
               </Collapsible>
-            </TabsContent>
-          ))}
-        </Tabs>
-      </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
+      <main className="flex h-[100%] p-4 gap-8"></main>
     </div>
   );
 }
