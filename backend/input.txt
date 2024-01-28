@@ -1,13 +1,10 @@
 3
-3
-eat
-tea
-tan
 4
-bat
-tab
-cat
-act
-2
-listen
-silent
+2 7 11 15
+9
+3
+3 2 4
+6
+5
+1 4 8 2 6
+10

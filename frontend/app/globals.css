@@ -107,6 +107,10 @@ h1 {
 .ltr {
   text-align: left;
 }
+.monaco-editor{
+
+  height: 100%;
+}
 
 .rtl {
   text-align: right;

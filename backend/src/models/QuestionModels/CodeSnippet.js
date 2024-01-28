@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const codeSnippetSchema = new mongoose.Schema({
-  _id: Number,
   lang: {
     type: String,
     required: true,

@@ -1,24 +1,20 @@
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    public static class Solution {
-        public List<List<String>> groupAnagrams(String[] strs) {
-            Map<String, List<String>> groupedAnagrams = new HashMap<>();
+    static class Solution {
+        public int[] twoSum(int[] nums, int target) {
+            Map<Integer, Integer> numIndices = new HashMap<>();
 
-            for (String str : strs) {
-                char[] charArray = str.toCharArray();
-                Arrays.sort(charArray);
-                String sortedStr = new String(charArray);
-
-                groupedAnagrams.computeIfAbsent(sortedStr, k -> new ArrayList<>()).add(str);
+            for (int i = 0; i < nums.length; i++) {
+                int complement = target - nums[i];
+                if (numIndices.containsKey(complement)) {
+                    return new int[]{numIndices.get(complement), i};
+                }
+                numIndices.put(nums[i], i);
             }
-
-            return new ArrayList<>(groupedAnagrams.values());
+            return null;
         }
     }
 
@@ -26,22 +22,23 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         int numTestCases = scanner.nextInt();
-        for (int testCase = 1; testCase <= numTestCases; ++testCase) {
 
-            int numStrings = scanner.nextInt();
-            scanner.nextLine(); // consume the newline
-            String[] inputStrings = new String[numStrings];
-            for (int i = 0; i < numStrings; ++i) {
-                inputStrings[i] = scanner.nextLine();
+        Solution solution = new Solution();
+
+        for (int testCase = 1; testCase <= numTestCases; testCase++) {
+
+            int n = scanner.nextInt();
+
+            int[] nums = new int[n];
+            for (int i = 0; i < n; i++) {
+                nums[i] = scanner.nextInt();
             }
 
-            // Call the function from the Solution class
-            Solution solution = new Solution();
-            List<List<String>> result = solution.groupAnagrams(inputStrings);
+            int target = scanner.nextInt();
 
-            for (List<String> group : result) {
-                System.out.println(String.join(" ", group));
-            }
+            int[] result = solution.twoSum(nums, target);
+
+            System.out.println(result[0] + ", " + result[1]);
         }
 
         scanner.close();

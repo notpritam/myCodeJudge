@@ -36,6 +36,7 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
         res.status(200).json({
           message: "Compilation Error : " + compliationError.toString(),
           error: true,
+          success: false,
           outputValue: "outputValue",
           input: "",
           expectedOutput: "",
@@ -48,6 +49,8 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
     const customInput = testCases.input.replace("\r", "");
     const inputFilePath = "input.txt";
     const expectedOutput = testCases.expectedOutput.replace("\r", "");
+    const outputFileList = expectedOutput.split("\n");
+    const inputList = customInput.split("\n");
 
     fs.writeFileSync(inputFilePath, customInput, "utf-8");
 
@@ -91,11 +94,14 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
       console.log(`Output: \n${outputValue}`);
       console.log(`Docker container closed with code ${code}`);
 
+      const outputList = outputValue.split("");
+
       if (expectedOutput.trim() === outputValue.trim()) {
         res.status(200).json({
           message: "All Test Cases Passed",
           outputValue: outputValue,
           error: false,
+          success: true,
           input: customInput,
           expectedOutput: expectedOutput,
         });
@@ -103,6 +109,7 @@ export const handleJavaCode = (req, res, userCode, testCases) => {
         res.status(200).json({
           message: "Test Cases Failed",
           error: true,
+          success: false,
           outputValue: outputValue,
           input: customInput,
           expectedOutput: expectedOutput,
