@@ -1,10 +1,25 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import useStore from "@/lib/store/UserStore";
 import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import axios from "axios";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const page = () => {
+  const { login, isLogged } = useStore();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get("callback");
+
+  console.log(search, "this is callback");
+
+  if (isLogged) {
+    window.location.href = `${search}`;
+  }
+
   const handleLogin = async (token: string) => {
     const response = await axios.post(
       "http://localhost:3001/api/auth/google/callback",
@@ -19,11 +34,12 @@ const page = () => {
 
     if (response.status === 200) {
       console.log("success");
-      console.log(response.data.user);
+      console.log(response.data);
       const token = response.data.token;
       // Store the token in local storage
       localStorage.setItem("token", token);
-      window.location.href = "/question/two-sum";
+      login(response.data.user, token);
+      // window.location.href = "/question/two-sum";
     }
   };
 
@@ -37,17 +53,17 @@ const page = () => {
   });
 
   return (
-    <div>
-      <header className="w-full h-[50px] bg-white dark:bg-[#282828] flex py-[120px]">
-        <div className="flex">
-          <div className="">logo</div>
-          <div className="">Explore</div>
-        </div>
-      </header>{" "}
-      <div>
-        <Input placeholder="username" />
-        <Input placeholder="password" />
-        <button onClick={() => loginClick()}>Login With Google</button>
+    <div className="dark p-4 bg-black overflow-hidden min-h-screen h-screen flex flex-col min-w-screen">
+      <header className="flex w-full justify-between border-b-2 pb-2">
+        <Link
+          href={"/"}
+          className="font-bold dark:text-primary  text-[18px] tracking-widest "
+        >
+          MyCodeJudge
+        </Link>
+      </header>
+      <div className="w-full h-screen flex justify-center items-center">
+        <Button onClick={() => loginClick()}>Login With Google</Button>
       </div>
     </div>
   );

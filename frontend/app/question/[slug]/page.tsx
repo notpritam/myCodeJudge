@@ -21,6 +21,8 @@ import { ChevronsDownUp } from "lucide-react";
 import { set } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
+import Header from "@/components/Header";
+import useStore from "@/lib/store/UserStore";
 
 interface CodeSnippet {
   lang: string;
@@ -66,6 +68,8 @@ function Page({ params }: { params: { slug: string } }) {
   const [codeResponse, setCodeResponse] = useState<CodeResponse>(
     {} as CodeResponse
   );
+
+  const { isLogged, token, logOut } = useStore();
   const [questionData, setQuestionData] = useState<Question>({} as Question);
   console.log(params.slug);
   const [loading, setLoading] = useState(true);
@@ -86,39 +90,43 @@ function Page({ params }: { params: { slug: string } }) {
   }, []);
 
   const evaluateCode = async () => {
-    setEvaluating(true);
-    const token = localStorage.getItem("token");
-    console.log(token, "frontend token");
-    const code = {
-      questionId: params.slug,
-      code: questionData.codeSnippets[0].code,
-      language: `java`,
-      questionDetails: questionData,
-    };
-    try {
-      const result = await axios.post(
-        process.env.NEXT_PUBLIC_API_URL + "/code/submit-code/" + params.slug,
-        code,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    if (!isLogged) {
+      toast.error("Please login to submit");
+      return;
+    } else {
+      setEvaluating(true);
+      const code = {
+        questionId: params.slug,
+        code: questionData.codeSnippets[0].code,
+        language: `java`,
+        questionDetails: questionData,
+      };
+      try {
+        const result = await axios.post(
+          process.env.NEXT_PUBLIC_API_URL + "/code/submit-code/" + params.slug,
+          code,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        console.log(result.data);
+
+        if (!result.data.error) {
+          toast.success("Code Evaluated Successfully");
+        } else {
+          toast.error(result.data.message);
         }
-      );
 
-      console.log(result.data);
-
-      if (!result.data.error) {
-        toast.success("Code Evaluated Successfully");
-      } else {
-        toast.error(result.data.message);
+        setCodeResponse(result.data);
+      } catch (e: any) {
+        toast.error(e.message as string);
+        logOut();
       }
-
-      setCodeResponse(result.data);
-    } catch (e: any) {
-      toast.error(e.message as string);
+      setEvaluating(false);
     }
-    setEvaluating(false);
   };
 
   const editorRef = useRef(null);
@@ -134,19 +142,7 @@ function Page({ params }: { params: { slug: string } }) {
 
   return (
     <div className="p-4 h-screen w-screen flex flex-col overflow-hidden dark bg-black">
-      <header className="flex justify-between border-b-2 pb-2">
-        <Link
-          href={"/"}
-          className="font-bold dark:text-primary tracking-wider text-[18px]"
-        >
-          MyCodeJudge
-        </Link>
-
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-      </header>
+      <Header />
 
       {loading ? (
         <div className="flex w-full h-full gap-8">

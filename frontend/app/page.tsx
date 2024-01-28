@@ -2,6 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
+import useStore from "@/lib/store/UserStore";
 import { cn } from "@/lib/utils";
 import axios from "axios";
 import { set } from "date-fns";
@@ -9,6 +10,15 @@ import { MoreVertical } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Header from "@/components/Header";
 interface CodeSnippet {
   lang: string;
   langSlug: string;
@@ -47,6 +57,8 @@ interface CodeResponse {
 export default function Home() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [loading, setLoading] = React.useState<boolean>(true);
+
+  const { picture, isLogged, givenName, logOut, email } = useStore();
   const categories = [
     { name: "Array", count: 1374 },
     { name: "String", count: 612 },
@@ -127,20 +139,7 @@ export default function Home() {
 
   return (
     <main className="flex h-screen dark bg-black p-4  w-screen flex-col ">
-      <header className="flex w-full justify-between border-b-2 pb-2">
-        <Link
-          href={"/"}
-          className="font-bold dark:text-primary tracking-wider text-[18px]"
-        >
-          MyCodeJudge
-        </Link>
-
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
-      </header>
-
+      <Header />
       <div className="flex flex-wrap gap-2 p-12 pt-4 pb-0 mt-4">
         {categories.map((item, i) => (
           <div className="px-4 cursor-pointer py-2 text-gray-400 bg-gray-700 rounded-3xl">
