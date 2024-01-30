@@ -82,39 +82,11 @@ export default function Home() {
     { name: "Prefix Sum", count: 127 },
   ];
 
-  // const questions = [
-  //   {
-  //     id: "1406",
-  //     title: "Stone Game III",
-  //     difficulty: "Hard",
-  //     acceptance_rate: "64.6%",
-  //   },
-  //   { id: "1", title: "Two Sum", difficulty: "Easy", acceptance_rate: "49.9%" },
-  //   {
-  //     id: "2",
-  //     title: "Add Two Numbers",
-  //     difficulty: "Medium",
-  //     acceptance_rate: "40.5%",
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "Longest Substring Without Repeating Characters",
-  //     difficulty: "Medium",
-  //     acceptance_rate: "33.8%",
-  //   },
-  //   {
-  //     id: "4",
-  //     title: "Median of Two Sorted Arrays",
-  //     difficulty: "Hard",
-  //     acceptance_rate: "36.5%",
-  //   },
-  // ];
-
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const getDifficultyColor = (difficulty: string) => {
-    if (difficulty == "Easy") {
+    if (difficulty == "easy") {
       return "text-green-500";
-    } else if (difficulty == "Medium") {
+    } else if (difficulty == "medium") {
       return "text-yellow-500";
     } else {
       return "text-red-500";

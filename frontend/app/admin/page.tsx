@@ -2,7 +2,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Code, Plus, Trash2, Users } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
 import { Payment, columns } from "./columns";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,30 @@ interface Question {
   testCases: TestCase;
 }
 
+export interface SavedQuestion {
+  _id: string;
+  level: string;
+  topics: string[];
+  companies: string[];
+  title: string;
+  "title-slug": string;
+  likes: number;
+  dislikes: number;
+  content: string;
+  codeSnippets: CodeSnippet[];
+  testCases: TestCase;
+  __v: number;
+}
+
+interface CodeResponse {
+  error: boolean;
+  message: string;
+  expectedOutput: string;
+  success: boolean;
+  input: string;
+  outputValue: string;
+}
+
 function Page() {
   const searchParams = useSearchParams();
 
@@ -52,6 +76,7 @@ function Page() {
   );
 
   const data: Payment[] = [];
+  const [questionList, setQuestionList] = useState<SavedQuestion[]>([]);
   const [addQuestion, setAddQuestion] = useState(false);
 
   const [addQuestionObject, setAddQuestionObject] = useState<Question>({
@@ -100,6 +125,7 @@ function Page() {
   });
 
   const [currentTopic, setCurrentTopic] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
   const [currentCompany, setCurrentCompany] = useState<string>("");
 
@@ -143,6 +169,32 @@ function Page() {
     console.log(question);
   };
 
+  const getDifficultyColor = (difficulty: string) => {
+    if (difficulty == "Easy") {
+      return "text-green-500";
+    } else if (difficulty == "Medium") {
+      return "text-yellow-500";
+    } else {
+      return "text-red-500";
+    }
+  };
+
+  const getQuestions = async () => {
+    try {
+      const result = await axios.get(
+        process.env.NEXT_PUBLIC_API_URL + "/questions/get"
+      );
+      setQuestionList(result.data);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    getQuestions();
+  }, []);
+
   return (
     <div className="min-h-screen max-h-screen min-w-screen max-w-screen  p-8 pt-4 dark bg-black">
       <header className="flex justify-between border-b-2 pb-2">
@@ -185,7 +237,7 @@ function Page() {
 
             <div className="container dark text-white mx-auto py-10">
               {!addQuestion ? (
-                <DataTable columns={columns} data={data} />
+                <DataTable columns={columns} data={questionList} />
               ) : (
                 <div className="flex flex-col gap-4">
                   <Input
