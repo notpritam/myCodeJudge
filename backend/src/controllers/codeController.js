@@ -1,4 +1,4 @@
-import { handleJavaCode } from "../services/codeServices.js";
+import { handleCPPCode, handleJavaCode } from "../services/codeServices.js";
 
 export const submitCode = (req, res) => {
   console.log(req.params.slug);
@@ -11,7 +11,11 @@ export const submitCode = (req, res) => {
 
   if (language.toLowerCase() === "java") {
     handleJavaCode(req, res, code, testCases);
-  } else {
+  } else if (language.toLowerCase() === "python") {
     res.send("Not Java");
+  } else if (language.toLowerCase() === "javascript") {
+    res.send("Not Java");
+  } else if (language.toLowerCase() === "cpp") {
+    handleCPPCode(req, res, code, testCases);
   }
 };
