@@ -1,4 +1,8 @@
-import { handleCPPCode, handleJavaCode } from "../services/codeServices.js";
+import {
+  handleCPPCode,
+  handleJavaCode,
+  handlePythonCode,
+} from "../services/codeServices.js";
 
 export const submitCode = (req, res) => {
   console.log(req.params.slug);
@@ -12,9 +16,16 @@ export const submitCode = (req, res) => {
   if (language.toLowerCase() === "java") {
     handleJavaCode(req, res, code, testCases);
   } else if (language.toLowerCase() === "python") {
-    res.send("Not Java");
+    handlePythonCode(req, res, code, testCases);
   } else if (language.toLowerCase() === "javascript") {
-    res.send("Not Java");
+    res.status(200).json({
+      message: "Javascript not supported at the moment",
+      outputValue: "",
+      error: true,
+      success: false,
+      input: "",
+      expectedOutput: "",
+    });
   } else if (language.toLowerCase() === "cpp") {
     handleCPPCode(req, res, code, testCases);
   }

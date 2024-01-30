@@ -222,3 +222,72 @@ export const handleCPPCode = (req, res, userCode, testCases) => {
     });
   }
 };
+
+export const handlePythonCode = (req, res, userCode, testCases) => {
+  const fileName = "main.py";
+  const filePath = `${__dirname}/${fileName}`;
+  fs.writeFileSync(filePath, userCode, "utf-8");
+
+  const customInput = testCases.input.replace("\r", "");
+  const inputFilePath = "input.txt";
+  const expectedOutput = testCases.expectedOutput.replace("\r", "");
+
+  fs.writeFileSync(inputFilePath, customInput, "utf-8");
+
+  const dockerContainer = spawn(
+    "docker",
+    [
+      "run",
+      "--rm",
+      "-i",
+      "-v",
+      `${__dirname}:/code`,
+      "coderunner_python",
+      "python3",
+      `main.py`,
+    ],
+    {
+      stdio: ["pipe", "pipe", "pipe"],
+    }
+  );
+
+  const inputStream = fs.createReadStream(inputFilePath);
+  inputStream.pipe(dockerContainer.stdin);
+
+  var outputValue = "";
+
+  dockerContainer.stdout.on("data", (data) => {
+    const output = data.toString();
+    outputValue += output;
+  });
+
+  dockerContainer.stderr.on("data", (stderr) => {
+    console.error(`Docker container stderr: ${stderr}`);
+  });
+
+  dockerContainer.on("close", (code) => {
+    console.log(`Expected Output: \n${expectedOutput}`);
+    console.log(`Output: \n${outputValue}`);
+    console.log(`Docker container closed with code ${code}`);
+
+    if (expectedOutput.trim() === outputValue.trim()) {
+      res.status(200).json({
+        message: "All Test Cases Passed",
+        outputValue: outputValue,
+        error: false,
+        success: true,
+        input: customInput,
+        expectedOutput: expectedOutput,
+      });
+    } else {
+      res.status(200).json({
+        message: "Test Cases Failed",
+        error: true,
+        success: false,
+        outputValue: outputValue,
+        input: customInput,
+        expectedOutput: expectedOutput,
+      });
+    }
+  });
+};

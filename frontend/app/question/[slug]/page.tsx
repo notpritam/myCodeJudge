@@ -74,6 +74,7 @@ function Page({ params }: { params: { slug: string } }) {
   console.log(params.slug);
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState(false);
+  const [selectedLangIndex, setSelectedLangIndex] = useState(0);
 
   const getQuestion = async () => {
     const result = await axios.get(
@@ -97,8 +98,8 @@ function Page({ params }: { params: { slug: string } }) {
       setEvaluating(true);
       const code = {
         questionId: params.slug,
-        code: questionData.codeSnippets[0].code,
-        language: `java`,
+        code: questionData.codeSnippets[selectedLangIndex].code,
+        language: questionData.codeSnippets[selectedLangIndex].langSlug,
         questionDetails: questionData,
       };
       try {
@@ -237,8 +238,14 @@ function Page({ params }: { params: { slug: string } }) {
                   className="h-full overflow-hidden w-full"
                 >
                   <TabsList>
-                    {questionData?.codeSnippets?.map((item) => (
-                      <TabsTrigger value={item.langSlug}>
+                    {questionData?.codeSnippets?.map((item, index) => (
+                      <TabsTrigger
+                        onClick={() => {
+                          // console.log(item.langSlug);
+                          setSelectedLangIndex(index);
+                        }}
+                        value={item.langSlug}
+                      >
                         {item.lang}
                       </TabsTrigger>
                     ))}
@@ -330,41 +337,33 @@ function Page({ params }: { params: { slug: string } }) {
                     ) : (
                       <>
                         <div className="flex h-full overflow-y-auto gap-4 text-white">
-                          {codeResponse.error ? (
-                            <>
-                              <span>
-                                <strong>Error</strong> : {codeResponse.message}
-                              </span>
-                            </>
-                          ) : (
-                            <div className="flex flex-col h-full overflow-y-auto">
-                              <span>{codeResponse.message}</span>
-                              <span>
-                                <strong>Input</strong> :{" "}
-                                {codeResponse.input
-                                  ?.split("\n")
-                                  .map((item: string) => {
-                                    return <p>{item}</p>;
-                                  })}
-                              </span>
-                              <span>
-                                <strong>Expected Output</strong> :{" "}
-                                {codeResponse.expectedOutput
-                                  ?.split("\n")
-                                  .map((item: string) => {
-                                    return <p>{item}</p>;
-                                  })}
-                              </span>
-                              <span>
-                                <strong>Output</strong> :{" "}
-                                {codeResponse.outputValue
-                                  ?.split("\n")
-                                  .map((item: string) => {
-                                    return <p>{item}</p>;
-                                  })}
-                              </span>
-                            </div>
-                          )}
+                          <div className="flex  gap-8 h-full overflow-y-auto">
+                            <span>{codeResponse.message}</span>
+                            <span>
+                              <strong>Input</strong> :{" "}
+                              {codeResponse.input
+                                ?.split("\n")
+                                .map((item: string) => {
+                                  return <p>{item}</p>;
+                                })}
+                            </span>
+                            <span>
+                              <strong>Expected Output</strong> :{" "}
+                              {codeResponse.expectedOutput
+                                ?.split("\n")
+                                .map((item: string) => {
+                                  return <p>{item}</p>;
+                                })}
+                            </span>
+                            <span>
+                              <strong>Output</strong> :{" "}
+                              {codeResponse.outputValue
+                                ?.split("\n")
+                                .map((item: string) => {
+                                  return <p>{item}</p>;
+                                })}
+                            </span>
+                          </div>
                         </div>
                       </>
                     )}
