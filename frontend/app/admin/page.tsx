@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Code, Plus, Trash2, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { DataTable } from "./data-table";
-import { Payment, columns } from "./columns";
+import { columns } from "./columns";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -17,7 +17,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TextEditor from "@/components/editor/Editor";
 import { Editor } from "@monaco-editor/react";
 import { useSearchParams } from "next/navigation";
-import { set } from "zod";
 import axios from "axios";
 
 interface CodeSnippet {
@@ -57,15 +56,6 @@ export interface SavedQuestion {
   __v: number;
 }
 
-interface CodeResponse {
-  error: boolean;
-  message: string;
-  expectedOutput: string;
-  success: boolean;
-  input: string;
-  outputValue: string;
-}
-
 function Page() {
   const searchParams = useSearchParams();
 
@@ -75,7 +65,6 @@ function Page() {
     section || "dashboard"
   );
 
-  const data: Payment[] = [];
   const [questionList, setQuestionList] = useState<SavedQuestion[]>([]);
   const [addQuestion, setAddQuestion] = useState(false);
 
@@ -119,30 +108,10 @@ function Page() {
     },
   });
 
-  const [currentTestCase, setCurrentTestCase] = useState<TestCase>({
-    input: "",
-    expectedOutput: "",
-  });
-
   const [currentTopic, setCurrentTopic] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
 
   const [currentCompany, setCurrentCompany] = useState<string>("");
-
-  // Function to add dummy data of Payment structure to data array
-  const addDummyData = () => {
-    for (let i = 0; i < 100; i++) {
-      const dummyPayment: Payment = {
-        id: `${i + 1}`, // Unique id for each entry
-        amount: 100 + i, // Unique amount for each entry
-        status: "success", // Add status field
-        email: `dummy${i + 1}@example.com`, // Unique email for each entry
-      };
-      data.push(dummyPayment);
-    }
-  };
-
-  addDummyData();
 
   const updateContent = (content: string) => {
     setAddQuestionObject({
@@ -167,16 +136,6 @@ function Page() {
     }
 
     console.log(question);
-  };
-
-  const getDifficultyColor = (difficulty: string) => {
-    if (difficulty == "Easy") {
-      return "text-green-500";
-    } else if (difficulty == "Medium") {
-      return "text-yellow-500";
-    } else {
-      return "text-red-500";
-    }
   };
 
   const getQuestions = async () => {

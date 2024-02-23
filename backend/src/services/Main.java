@@ -1,40 +1,45 @@
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    public static class Solution {
-        public int lengthOfLongestSubstring(String s) {
-            int n = s.length();
-            Set<Character> set = new HashSet<>();
-            int maxLength = 0, i = 0, j = 0;
+    static class Solution {
+        public int[] twoSum(int[] nums, int target) {
+            Map<Integer, Integer> numIndices = new HashMap<>();
 
-            while (i < n && j < n) {
-                if (!set.contains(s.charAt(j))) {
-                    set.add(s.charAt(j++));
-                    maxLength = Math.max(maxLength, j - i);
-                } else {
-                    set.remove(s.charAt(i++));
+            for (int i = 0; i < nums.length; i++) {
+                int complement = target - nums[i];
+                if (numIndices.containsKey(complement)) {
+                    return new int[]{numIndices.get(complement), i};
                 }
+                numIndices.put(nums[i], i);
             }
 
-          //Adding the solution also to save time...
-            // return maxLength;
+            return null;
         }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        Solution solution = new Solution();
 
         int numTestCases = scanner.nextInt();
-        scanner.nextLine();
-        for (int testCase = 1; testCase <= numTestCases; ++testCase) {
 
-            String inputString = scanner.nextLine();
+        Solution solution = new Solution();
 
-            int result = solution.lengthOfLongestSubstring(inputString);
-            System.out.println(result);
+        for (int testCase = 1; testCase <= numTestCases; testCase++) {
+
+            int n = scanner.nextInt();
+
+            int[] nums = new int[n];
+            for (int i = 0; i < n; i++) {
+                nums[i] = scanner.nextInt();
+            }
+
+            int target = scanner.nextInt();
+
+            int[] result = solution.twoSum(nums, target);
+
+            System.out.println(result[0] + ", " + result[1]);
         }
 
         scanner.close();
