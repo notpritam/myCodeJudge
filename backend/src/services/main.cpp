@@ -1,44 +1,39 @@
 #include <iostream>
-#include <unordered_map>
-#include <vector>
+#include <unordered_set>
+#include <string>
 
 class Solution {
 public:
-    std::vector<int> twoSum(std::vector<int>& nums, int target) {
-        std::unordered_map<int, int> numIndices;
+    int lengthOfLongestSubstring(std::string s) {
+        int n = s.length();
+        std::unordered_set<char> charSet;
+        int maxLength = 0, i = 0, j = 0;
 
-        for (int i = 0; i < nums.size(); ++i) {
-            int complement = target - nums[i];
-            if (numIndices.find(complement) != numIndices.end()) {
-                return {numIndices[complement], i};
+        while (i < n && j < n) {
+            if (charSet.find(s[j]) == charSet.end()) {
+                charSet.insert(s[j++]);
+                maxLength = std::max(maxLength, j - i);
+            } else {
+                charSet.erase(s[i++]);
             }
-            numIndices[nums[i]] = i;
         }
 
-        return {};
+        return maxLength;
     }
 };
 
 int main() {
-    int numTestCases;
-    std::cin >> numTestCases;
     Solution solution;
 
+    int numTestCases;
+    std::cin >> numTestCases;
+
     for (int testCase = 1; testCase <= numTestCases; ++testCase) {
-        int n;
-        std::cin >> n;
+        std::string inputString;
+        std::cin >> inputString;
 
-        std::vector<int> nums(n);
-        for (int i = 0; i < n; ++i) {
-            std::cin >> nums[i];
-        }
-
-        int target;
-        std::cin >> target;
-
-        std::vector<int> result = solution.twoSum(nums, target);
-
-        std::cout << result[0] << ", " << result[1] << std::endl;
+        int result = solution.lengthOfLongestSubstring(inputString);
+        std::cout << result << std::endl;
     }
 
     return 0;

@@ -1,45 +1,40 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Scanner;
 
 public class Main {
-    static class Solution {
-        public int[] twoSum(int[] nums, int target) {
-            Map<Integer, Integer> numIndices = new HashMap<>();
+    public static class Solution {
+        public int lengthOfLongestSubstring(String s) {
+            int n = s.length();
+            Set<Character> set = new HashSet<>();
+            int maxLength = 0, i = 0, j = 0;
 
-            for (int i = 0; i < nums.length; i++) {
-                int complement = target - nums[i];
-                if (numIndices.containsKey(complement)) {
-                    return new int[]{numIndices.get(complement), i};
+            while (i < n && j < n) {
+                if (!set.contains(s.charAt(j))) {
+                    set.add(s.charAt(j++));
+                    maxLength = Math.max(maxLength, j - i);
+                } else {
+                    set.remove(s.charAt(i++));
                 }
-                numIndices.put(nums[i], i);
             }
 
-            return null;
+          //Adding the solution also to save time...
+        return maxLength;
         }
     }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-
-        int numTestCases = scanner.nextInt();
-
         Solution solution = new Solution();
 
-        for (int testCase = 1; testCase <= numTestCases; testCase++) {
+        int numTestCases = scanner.nextInt();
+        scanner.nextLine();
+        for (int testCase = 1; testCase <= numTestCases; ++testCase) {
 
-            int n = scanner.nextInt();
+            String inputString = scanner.nextLine();
 
-            int[] nums = new int[n];
-            for (int i = 0; i < n; i++) {
-                nums[i] = scanner.nextInt();
-            }
-
-            int target = scanner.nextInt();
-
-            int[] result = solution.twoSum(nums, target);
-
-            System.out.println(result[0] + ", " + result[1]);
+            int result = solution.lengthOfLongestSubstring(inputString);
+            System.out.println(result);
         }
 
         scanner.close();
