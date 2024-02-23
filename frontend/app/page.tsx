@@ -1,23 +1,12 @@
 "use client";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
 import { Skeleton } from "@/components/ui/skeleton";
-import useStore from "@/lib/store/UserStore";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import { set } from "date-fns";
 import { MoreVertical } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import Header from "@/components/Header";
 interface CodeSnippet {
   lang: string;
@@ -45,20 +34,10 @@ interface Question {
   __v: number;
 }
 
-interface CodeResponse {
-  error: boolean;
-  message: string;
-  expectedOutput: string;
-  success: boolean;
-  input: string;
-  outputValue: string;
-}
-
 export default function Home() {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
   const [loading, setLoading] = React.useState<boolean>(true);
 
-  const { picture, isLogged, givenName, logOut, email } = useStore();
   const categories = [
     { name: "Array", count: 1374 },
     { name: "String", count: 612 },
@@ -83,6 +62,7 @@ export default function Home() {
   ];
 
   const [questions, setQuestions] = React.useState<Question[]>([]);
+
   const getDifficultyColor = (difficulty: string) => {
     if (difficulty == "easy") {
       return "text-green-500";

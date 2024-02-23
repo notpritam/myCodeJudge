@@ -1,9 +1,8 @@
 "use client";
 import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
-import Editor, { Monaco } from "@monaco-editor/react";
+import Editor from "@monaco-editor/react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
@@ -18,9 +17,7 @@ import {
 } from "@/components/ui/resizable";
 
 import { ChevronsDownUp } from "lucide-react";
-import { set } from "zod";
 import { Skeleton } from "@/components/ui/skeleton";
-import Link from "next/link";
 import Header from "@/components/Header";
 import useStore from "@/lib/store/UserStore";
 
@@ -58,11 +55,6 @@ interface CodeResponse {
   input: string;
   outputValue: string;
 }
-const TitleAndDes = () => {
-  <>
-    <span className="font-bold text-black text-8">Two Sum</span>
-  </>;
-};
 
 function Page({ params }: { params: { slug: string } }) {
   const [codeResponse, setCodeResponse] = useState<CodeResponse>(
@@ -129,15 +121,6 @@ function Page({ params }: { params: { slug: string } }) {
       setEvaluating(false);
     }
   };
-
-  const editorRef = useRef(null);
-
-  function handleEditorDidMount(editor: any, monaco: Monaco) {
-    // here is the editor instance
-    // you can store it in `useRef` for further usage
-    console.log("hhh", editor, monaco);
-    editorRef.current = editor;
-  }
 
   const [showConsole, setShowConsole] = useState(false);
 
@@ -263,22 +246,12 @@ function Page({ params }: { params: { slug: string } }) {
                         }
                         defaultValue={item.code}
                         theme="vs-dark"
-                        // defineTheme={{
-                        //   themeName: "my-theme",
-                        //   themeData: {
-                        //     colors: {
-                        //       "editor.background": "#000000",
-                        //     },
-                        //   },
-                        // }}
                         width="100%"
                         options={{
                           minimap: {
                             enabled: false,
                           },
                           fontSize: 16,
-
-                          // cursorStyle: "block",
                           wordWrap: "on",
                         }}
                         onChange={(e) => {
@@ -304,8 +277,6 @@ function Page({ params }: { params: { slug: string } }) {
               <ResizableHandle className="h-[1.5rem] bg-gray-500" />
               <ResizablePanel
                 style={{ flex: showConsole ? "30 1 0px" : "15 1 0px" }}
-                // className={showConsole ? "flex-[30]" : "flex-[15]"}
-                // defaultSize={15}
                 className="overfow-hidden w-full"
               >
                 <Collapsible
@@ -319,7 +290,6 @@ function Page({ params }: { params: { slug: string } }) {
                         onClick={() => setShowConsole(!showConsole)}
                       />
                     </span>
-                    {/* <Button onClick={evaluateCode}>Run</Button> */}
                     <Button
                       disabled={evaluating}
                       className="bg-green-700 text-white"
